@@ -42,6 +42,7 @@
         src: "../templates/{{item.template}}"
         dest: "{{item.dest}}"
         mode: "{{item.mode}}"
+      notify: "restart sssd"
       with_items:
         # SSSD
         - { template: sssd/sssd.conf.j2,  dest: /usr/local/etc/sssd/sssd.conf, mode: "0600" }
@@ -52,3 +53,6 @@
 
         # Sudo
         - { template: sudoers/sudoers,  dest: /usr/local/etc/sudoers, mode: "0440" }
+
+        # nsswitch
+        - { template: nsswitch/nsswitch.conf,  dest: /etc/nsswitch.conf, mode: "0644" }
