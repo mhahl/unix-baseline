@@ -20,7 +20,7 @@
           dest: "/etc/resolv.conf"
           mode: "0755"
           owner: "root"
-          group: "root"
+          group: "wheel"
         tags:
           - dns
           - dns:configure
