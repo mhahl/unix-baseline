@@ -1,0 +1,7 @@
+search {{dns_search | join(' ') }}
+
+{% for server in dns_servers %}
+nameserver {{server}}
+{%endfor%}
+
+options timeout:5

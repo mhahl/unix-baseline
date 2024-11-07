@@ -1,0 +1,54 @@
+---
+- hosts: localhost
+  vars_files:
+    - config/defaults.yaml
+  handlers:
+
+    - name: restart sssd
+      service:
+        name: sssd
+        state: restarted
+
+  tasks:
+
+    - name: system-baseline | configure dns
+      block:
+
+      - name: dns | configure nameservers
+        template:
+          src: "../templates/dns/resolv.conf.j2"
+          dest: "/etc/resolv.conf"
+          mode: "0755"
+          owner: "root"
+          group: "root"
+        tags:
+          - dns
+          - dns:configure
+      tags:
+        - dns
+
+    - name: system-baseline | install packages
+      package:
+        name:
+          - sssd2
+          - bash
+          - pam_mkhomedir
+      tags:
+        - baseline
+        - baseline:packages
+
+    - name: openldap-freebsd | deploy file templates
+      ansible.builtin.template:
+        src: "../templates/{{item.template}}"
+        dest: "{{item.dest}}"
+        mode: 0755
+      with_items:
+        # SSSD
+        - { template: sssd/sssd.conf.j2,  dest: /usr/local/etc/sssd/sssd.conf }
+
+        # PAM
+        - { template: pam/system,  dest: /etc/pam.d/system }
+        - { template: pam/sshd,  dest: /etc/pam.d/sshd     }
+
+        # Sudo
+        - { template: sudoers/sudoers,  dest: /usr/local/etc/sudoers     }

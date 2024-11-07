@@ -1,0 +1,39 @@
+[sssd]
+config_file_version = 2
+services = nss, pam, sudo
+domains = LDAP
+
+[nss]
+homedir_substring = /home
+[nss]
+default_shell = /usr/local/bin/bash
+
+[pam]
+
+[domain/LDAP]
+id_provider = ldap
+sudo_provider = ldap
+auth_provider = ldap
+autofs_provider = ldap
+auth_provider = ldap
+chpass_provider = ldap
+
+# ldap_schema can be set to "rfc2307", which stores group member names in the
+# "memberuid" attribute, or to "rfc2307bis", which stores group member DNs in
+# the "member" attribute. If you do not know this value, ask your LDAP
+# administrator.
+ldap_schema = rfc2307
+ldap_uri = ldap://ldap.sigaint.au
+ldap_search_base = dc=sigaint,dc=au
+ldap_id_use_start_tls = true
+ldap_tls_reqcert = allow
+
+ldap_sudo_search_base = ou=SUDOers,dc=sigaint,dc=au
+
+# Note that enabling enumeration will have a moderate performance impact.
+# Consequently, the default value for enumeration is FALSE.
+# Refer to the sssd.conf man page for full details.
+enumerate = true
+
+# Allow offline logins by locally storing password hashes (default: false).
+cache_credentials = false
