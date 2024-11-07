@@ -41,7 +41,7 @@
       ansible.builtin.template:
         src: "../templates/{{item.template}}"
         dest: "{{item.dest}}"
-        mode: "{{item.mode)}}"
+        mode: "{{item.mode}}"
       with_items:
         # SSSD
         - { template: sssd/sssd.conf.j2,  dest: /usr/local/etc/sssd/sssd.confm, mode: "0600" }
