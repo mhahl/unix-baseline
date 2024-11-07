@@ -33,6 +33,7 @@
           - sssd2
           - bash
           - pam_mkhomedir
+          - sudo
       tags:
         - baseline
         - baseline:packages
