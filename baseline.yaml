@@ -43,9 +43,9 @@
       ansible.builtin.file:
         path: "{{item}}"
         state: directory
-        with_items:
-          - /home
-          - /usr/local/etc/pkg/repos
+      with_items:
+        - /home
+        - /usr/local/etc/pkg/repos
 
     - name: openldap-freebsd | deploy file templates
       ansible.builtin.template:
