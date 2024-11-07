@@ -38,6 +38,12 @@
         - baseline
         - baseline:packages
 
+
+    - name: openldap-freebsd | create directories
+      ansible.builtin.file:
+        path: /usr/local/etc/pkg/repos
+        state: directory
+
     - name: openldap-freebsd | deploy file templates
       ansible.builtin.template:
         src: "../templates/{{item.template}}"
