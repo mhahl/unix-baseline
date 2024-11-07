@@ -57,3 +57,7 @@
 
         # nsswitch
         - { template: nsswitch/nsswitch.conf,  dest: /etc/nsswitch.conf, mode: "0644" }
+
+        #pkg
+        #/usr/local/etc/pkg/repos/FreeBSD.conf
+        - { template: pkg/FreeBSD.conf,  dest: /usr/local/etc/pkg/repos/FreeBSD.conf, mode: "0644" }
