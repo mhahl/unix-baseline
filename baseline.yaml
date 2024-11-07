@@ -41,13 +41,13 @@
       ansible.builtin.template:
         src: "../templates/{{item.template}}"
         dest: "{{item.dest}}"
-        mode: "{{item.mode | default(0755)}}"
+        mode: "{{item.mode)}}"
       with_items:
         # SSSD
         - { template: sssd/sssd.conf.j2,  dest: /usr/local/etc/sssd/sssd.confm, mode: "0600" }
 
         # PAM
-        - { template: pam/system,  dest: /etc/pam.d/syste, mode: "0644"}
+        - { template: pam/system,  dest: /etc/pam.d/system, mode: "0644"}
         - { template: pam/sshd,  dest: /etc/pam.d/sshd,    mode: "0644"}
 
         # Sudo
