@@ -44,7 +44,7 @@
         mode: "{{item.mode}}"
       with_items:
         # SSSD
-        - { template: sssd/sssd.conf.j2,  dest: /usr/local/etc/sssd/sssd.confm, mode: "0600" }
+        - { template: sssd/sssd.conf.j2,  dest: /usr/local/etc/sssd/sssd.conf, mode: "0600" }
 
         # PAM
         - { template: pam/system,  dest: /etc/pam.d/system, mode: "0644"}
