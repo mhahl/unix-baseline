@@ -2,6 +2,7 @@
 - hosts: localhost
   vars_files:
     - config/defaults.yaml
+    - config/secrets.yaml
   handlers:
 
     - name: restart sssd

@@ -27,8 +27,10 @@ ldap_uri = ldap://ldap.sigaint.au
 ldap_search_base = dc=sigaint,dc=au
 ldap_id_use_start_tls = true
 ldap_tls_reqcert = allow
-
 ldap_sudo_search_base = ou=SUDOers,dc=sigaint,dc=au
+
+ldap_default_bind_dn = {{ldap_default_bind_dn}}
+ldap_default_authtok = {{ldap_default_authtok}}
 
 # Note that enabling enumeration will have a moderate performance impact.
 # Consequently, the default value for enumeration is FALSE.
