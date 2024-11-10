@@ -71,3 +71,6 @@
         #pkg
         #/usr/local/etc/pkg/repos/FreeBSD.conf
         - { template: pkg/FreeBSD.conf,  dest: /usr/local/etc/pkg/repos/FreeBSD.conf, mode: "0644" }
+
+        # SSH
+        - { template: ssh/sshd_config,  dest: /etc/ssh/sshd_config, mode: "0644" }
