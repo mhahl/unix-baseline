@@ -40,8 +40,11 @@
         - baseline:packages
 
     - name: system-baseline | deploy motd
+      with_items:
+        - /etc/motd
+        - /var/run/motd
       copy:
-        dest: "/etc/motd"
+        dest: "{{item}}"
         content: |+
           $
                           __
@@ -84,6 +87,6 @@
 
         # SSH
         - { template: ssh/sshd_config,  dest: /etc/ssh/sshd_config, mode: "0644" }
-        
+
         # Cron
         - { template: cron/baseline,  dest: /etc/cron.d/baseline, mode: "0644" }
