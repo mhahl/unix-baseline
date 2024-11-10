@@ -39,8 +39,19 @@
         - baseline
         - baseline:packages
 
+    - name: system-baseline | deploy motd
+      copy:
+        dest: "/etc/motd"
+        content: |+
+          $
+                          __
+                         / _)
+                _.----._/ /
+               /         /
+            __/ (  | (  | It's a UNIX System!
+           /__.-'|_|--|_|    I know this!  
 
-    - name: openldap-freebsd | create directories
+    - name: freebsd-baseline | create directories
       ansible.builtin.file:
         path: "{{item}}"
         state: directory
@@ -48,7 +59,7 @@
         - /home
         - /usr/local/etc/pkg/repos
 
-    - name: openldap-freebsd | deploy file templates
+    - name: system-baseline | deploy file templates
       ansible.builtin.template:
         src: "../templates/{{item.template}}"
         dest: "{{item.dest}}"
@@ -68,9 +79,11 @@
         # nsswitch
         - { template: nsswitch/nsswitch.conf,  dest: /etc/nsswitch.conf, mode: "0644" }
 
-        #pkg
         #/usr/local/etc/pkg/repos/FreeBSD.conf
         - { template: pkg/FreeBSD.conf,  dest: /usr/local/etc/pkg/repos/FreeBSD.conf, mode: "0644" }
 
         # SSH
         - { template: ssh/sshd_config,  dest: /etc/ssh/sshd_config, mode: "0644" }
+        
+        # Cron
+        - { template: cron/baseline,  dest: /etc/cron.d/baseline, mode: "0644" }
