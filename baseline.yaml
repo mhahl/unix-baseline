@@ -40,7 +40,7 @@
         - baseline:packages
 
 
-    - name: openldap-freebsd | create directories
+    - name: baseline-freebsd | create directories
       ansible.builtin.file:
         path: "{{item}}"
         state: directory
@@ -48,7 +48,7 @@
         - /home
         - /usr/local/etc/pkg/repos
 
-    - name: openldap-freebsd | deploy file templates
+    - name: baseline-freebsd | deploy file templates
       ansible.builtin.template:
         src: "../templates/{{item.template}}"
         dest: "{{item.dest}}"
@@ -74,3 +74,9 @@
 
         # SSH
         - { template: ssh/sshd_config,  dest: /etc/ssh/sshd_config, mode: "0644" }
+
+    - name: baseline-freebsd | start services
+      service:
+        name: "sssd"
+        state: started
+        enabled: yes
