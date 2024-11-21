@@ -106,5 +106,7 @@
         url: "{{item.url}}"
         dest: /home/{{item.name}}/.ssh/authorized_keys
         mode: '0600'
+        owner: "{{item.name}}"
+        group: "grp-sigaint-users"
       with_items: "{{user_ssh_keys}}"
       ignore_errors: true
