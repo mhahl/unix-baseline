@@ -108,5 +108,3 @@
         mode: '0600'
       with_items: "{{user_ssh_keys}}"
       ignore_errors: true
-
-
