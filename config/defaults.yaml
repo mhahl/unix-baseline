@@ -10,4 +10,4 @@ dns_servers:
 
 # Fetch the ssh keys for the users here
 user_ssh_keys:
-  - { name: 'mhahl', keys: https://github.com/mhahl.keys}
+  - { name: 'mhahl', url: https://github.com/mhahl.keys}
