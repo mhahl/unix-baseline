@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo -n "Vault Password: "
-read -s password
+read password
 
 mkdir -p /var/db/baseline
 

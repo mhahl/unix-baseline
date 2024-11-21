@@ -61,6 +61,7 @@
       with_items:
         - /home
         - /usr/local/etc/pkg/repos
+        - /usr/share/skel
 
     - name: baseline-freebsd | deploy file templates
       ansible.builtin.template:
@@ -91,9 +92,21 @@
         # Cron
         - { template: cron/baseline,  dest: /etc/cron.d/baseline, mode: "0644" }
 
+        # Skel
+        - { template: skel/dot.bashrc,  dest: /usr/share/skel/dot.bashrc, mode: "0644" }
+
     - name: baseline-freebsd | start services
       service:
         name: "sssd"
         state: started
         enabled: yes
+
+    - name: baseline-freebsd | download ssh keys
+      ansible.builtin.get_url:
+        url: "{{item.url}}"
+        dest: /home/{{item.name}}/.ssh/authorized_keys
+        mode: '0600'
+      with_items: "{{user_ssh_keys}}"
+      ignore_errors: true
+
 

@@ -1,7 +1,13 @@
 dns_search:
   - sigaint.au
+
+# Quad 9 and Cloudflare DNS as a backup.
 dns_servers:
   - 9.9.9.9
   - 1.1.1.1
   - 2620:fe::fe
   - 2620:fe::9
+
+# Fetch the ssh keys for the users here
+user_ssh_keys:
+  - { name: 'mhahl', keys: https://github.com/mhahl.keys}
