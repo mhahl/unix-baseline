@@ -94,6 +94,7 @@
 
         # Skel
         - { template: skel/dot.bashrc,  dest: /usr/share/skel/dot.bashrc, mode: "0644" }
+        - { template: skel/dot.bash_profile,  dest: /usr/share/skel/dot.bash_profile, mode: "0644" }
 
     - name: baseline-freebsd | start services
       service:
