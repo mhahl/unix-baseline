@@ -12,6 +12,10 @@
 
   tasks:
 
+        # Include host vars if they exist
+    - include_vars: "/usr/local/etc/baseline/config.yaml"
+      failed_when: false
+
     - name: system-baseline | configure dns
       block:
 
@@ -27,6 +31,7 @@
           - dns:configure
       tags:
         - dns
+      when: configure_dns | default(True)
 
     - name: system-baseline | install packages
       package:
