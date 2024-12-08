@@ -15,58 +15,18 @@
         # Include host vars if they exist
     - include_vars: "/usr/local/etc/baseline/config.yaml"
       failed_when: false
-
-    - name: system-baseline | configure dns
-      block:
-
-      - name: dns | configure nameservers
-        template:
-          src: "../templates/dns/resolv.conf.j2"
-          dest: "/etc/resolv.conf"
-          mode: "0755"
-          owner: "root"
-          group: "wheel"
-        tags:
-          - dns
-          - dns:configure
       tags:
-        - dns
-      when: configure_dns | default(True)
+        - always
 
-    - name: system-baseline | install packages
-      package:
-        name:
-          - sssd2
-          - bash
-          - pam_mkhomedir
-          - sudo
-      tags:
-        - baseline
-        - baseline:packages
+    - include_tasks: "playbooks/prereqs.yaml"
+      when: configure_prereqs | default(true)
 
-    - name: system-baseline | deploy motd
-      with_items:
-        - /etc/motd
-        - /var/run/motd
-      copy:
-        dest: "{{item}}"
-        content: |+
-          $
-                          __
-                         / _)
-                _.----._/ /
-               /         /
-            __/ (  | (  | It's a UNIX System!
-           /__.-'|_|--|_|    I know this!  
+    - include_tasks: "playbooks/dns.yaml"
+      when: configure_dns | default(true)
 
-    - name: system-baseline | create directories
-      ansible.builtin.file:
-        path: "{{item}}"
-        state: directory
-      with_items:
-        - /home
-        - /usr/local/etc/pkg/repos
-        - /usr/share/skel
+    - include_tasks: "playbooks/motd.yaml"
+      when: configure_motd | default(true)
+
 
     - name: baseline-freebsd | deploy file templates
       ansible.builtin.template:

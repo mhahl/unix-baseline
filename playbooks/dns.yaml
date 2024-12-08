@@ -1,0 +1,15 @@
+- name: system-baseline | configure dns
+  block:
+    - name: dns | configure nameservers
+      template:
+        src: "../templates/dns/resolv.conf.j2"
+        dest: "/etc/resolv.conf"
+        mode: "0755"
+        owner: "root"
+        group: "wheel"
+      tags:
+        - dns
+        - dns:configure
+  tags:
+    - dns
+    - dns:configure
