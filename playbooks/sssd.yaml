@@ -1,0 +1,25 @@
+---
+- name: freebsd-baseline | sssd | install packages
+  ansible.builtin.package:
+    name:
+      - sssd2
+  tags:
+    - baseline:ssd
+    - baseline:ssd:packages
+
+- name: freebsd-baseline | sssd | deploy templates
+  ansible.builtin.template:
+    src: "../templates/{{ item.template }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  with_items:
+    - { template: sssd/sssd.conf.j2, dest: /usr/local/etc/sssd/sssd.conf, mode: "0600" }
+    - { template: pam/system, dest: /etc/pam.d/system, mode: "0644" }
+    - { template: pam/sshd, dest: /etc/pam.d/sshd, mode: "0644" }
+    - { template: nsswitch/nsswitch.conf, dest: /etc/nsswitch.conf, mode: "0644" }
+
+- name: baseline-freebsd | sssd | start services
+  ansible.builtin.service:
+    name: "sssd"
+    state: started
+    enabled: true

@@ -1,15 +1,16 @@
-- name: system-baseline | configure dns
+---
+- name: system-baseline | Configure DNS
+  tags:
+    - dns
+    - dns:configure
   block:
-    - name: dns | configure nameservers
-      template:
+    - name: dns | Configure nameservers
+      ansible.builtin.template:
         src: "../templates/dns/resolv.conf.j2"
         dest: "/etc/resolv.conf"
         mode: "0755"
         owner: "root"
         group: "wheel"
       tags:
-        - dns
-        - dns:configure
-  tags:
-    - dns
-    - dns:configure
+        - baseline:dns
+        - baseline:dns:configure

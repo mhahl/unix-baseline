@@ -4,75 +4,35 @@
     - config/defaults.yaml
     - config/secrets.yaml
   handlers:
-
-    - name: restart sssd
-      service:
+    - name: Restart sssd
+      ansible.builtin.service:
         name: sssd
         state: restarted
 
   tasks:
-
-        # Include host vars if they exist
-    - include_vars: "/usr/local/etc/baseline/config.yaml"
+    # Include host vars if they exist
+    - ansible.builtin.include_vars: "/usr/local/etc/baseline/config.yaml"
       failed_when: false
       tags:
         - always
 
-    - include_tasks: "playbooks/prereqs.yaml"
-      when: configure_prereqs | default(true)
-
-    - include_tasks: "playbooks/dns.yaml"
+    - ansible.builtin.include_tasks: "playbooks/dns.yaml"
       when: configure_dns | default(true)
 
-    - include_tasks: "playbooks/motd.yaml"
+    - ansible.builtin.include_tasks: "playbooks/motd.yaml"
       when: configure_motd | default(true)
 
+    - ansible.builtin.include_tasks: "playbooks/skel.yaml"
+      when: configure_skel | default(true)
 
-    - name: baseline-freebsd | deploy file templates
-      ansible.builtin.template:
-        src: "../templates/{{item.template}}"
-        dest: "{{item.dest}}"
-        mode: "{{item.mode}}"
-      notify: "restart sssd"
-      with_items:
-        # SSSD
-        - { template: sssd/sssd.conf.j2,  dest: /usr/local/etc/sssd/sssd.conf, mode: "0600" }
+    - ansible.builtin.include_tasks: "playbooks/sssd.yaml"
+      when: configure_sssd | default(true)
 
-        # PAM
-        - { template: pam/system,  dest: /etc/pam.d/system, mode: "0644"}
-        - { template: pam/sshd,  dest: /etc/pam.d/sshd,    mode: "0644"}
+    - ansible.builtin.include_tasks: "playbooks/sudoers.yaml"
+      when: configure_sudoers | default(true)
 
-        # Sudo
-        - { template: sudoers/sudoers,  dest: /usr/local/etc/sudoers, mode: "0440" }
+    - ansible.builtin.include_tasks: "playbooks/sshd.yaml"
+      when: configure_sshd | default(true)
 
-        # nsswitch
-        - { template: nsswitch/nsswitch.conf,  dest: /etc/nsswitch.conf, mode: "0644" }
-
-        #/usr/local/etc/pkg/repos/FreeBSD.conf
-        - { template: pkg/FreeBSD.conf,  dest: /usr/local/etc/pkg/repos/FreeBSD.conf, mode: "0644" }
-
-        # SSH
-        - { template: ssh/sshd_config,  dest: /etc/ssh/sshd_config, mode: "0644" }
-
-        # Cron
-        - { template: cron/baseline,  dest: /etc/cron.d/baseline, mode: "0644" }
-
-        # Skel
-        - { template: skel/dot.bashrc,  dest: /usr/share/skel/dot.bashrc, mode: "0644" }
-        - { template: skel/dot.bash_profile,  dest: /usr/share/skel/dot.bash_profile, mode: "0644" }
-
-    - name: baseline-freebsd | start services
-      service:
-        name: "sssd"
-        state: started
-        enabled: yes
-
-    - name: baseline-freebsd | download ssh keys
-      ansible.builtin.get_url:
-        url: "{{item.url}}"
-        dest: /home/{{item.name}}/.ssh/authorized_keys
-        mode: '0600'
-        owner: "{{item.name}}"
-        group: "grp-sigaint-users"
-      with_items: "{{user_ssh_keys}}"
-      ignore_errors: true
+    - ansible.builtin.include_tasks: "playbooks/baseline.yaml"
+      when: configure_baseline | default(true)

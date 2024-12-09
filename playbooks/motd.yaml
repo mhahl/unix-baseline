@@ -1,12 +1,13 @@
-- name: system-baseline | deploy motd
+---
+- name: system-baseline | Deploy motd
   tags:
-    - motd
-    - motd:configure
+    - baseline:motd
+    - baseline:motd:configure
   with_items:
     - /etc/motd
     - /var/run/motd
-  copy:
-    dest: "{{item}}"
+  ansible.builtin.copy:
+    dest: "{{ item }}"
     content: |+
       $
                       __
@@ -15,3 +16,5 @@
            /         /
         __/ (  | (  | It's a UNIX System!
        /__.-'|_|--|_|    I know this!
+      
+      > 

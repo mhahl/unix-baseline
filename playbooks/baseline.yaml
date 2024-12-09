@@ -1,0 +1,9 @@
+---
+- name: baseline-freebsd | baseline | deploy file templates
+  ansible.builtin.template:
+    src: "../templates/{{ item.template }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  with_items:
+    - { template: pkg/FreeBSD.conf, dest: /usr/local/etc/pkg/repos/FreeBSD.conf, mode: "0644" }
+    - { template: cron/baseline, dest: /etc/cron.d/baseline, mode: "0644" }
