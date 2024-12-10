@@ -8,7 +8,6 @@
     - baseline:sshd
     - baseline:sshd:configure
   with_items:
-    # SSH
     - { template: ssh/sshd_config, dest: /etc/ssh/sshd_config, mode: "0644" }
 
 - name: baseline-freebsd | sshd | download ssh keys

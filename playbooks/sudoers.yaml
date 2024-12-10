@@ -12,6 +12,9 @@
     src: "../templates/{{ item.template }}"
     dest: "{{ item.dest }}"
     mode: "{{ item.mode }}"
+  tags:
+    - baseline:sudoers
+    - baseline:sudoers:configure
   with_items:
     # Sudo
     - { template: sudoers/sudoers, dest: /usr/local/etc/sudoers, mode: "0440" }

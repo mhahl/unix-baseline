@@ -12,3 +12,50 @@ dns_servers:
 # Fetch the ssh keys for the users here
 user_ssh_keys:
   - { name: "mhahl", url: https://github.com/mhahl.keys }
+
+# Alias workstations to the hosts that are considered workstations.
+hbac_sudo_hosts:
+  - name: WORKSTATIONS
+    hosts:
+      - huon.sigaint.au
+      - pine.sigaint.au
+      - laptop*.sigaint.au
+      - workstation*.sigaint.au
+
+hbac_sudo_commands: []
+##  - name: REBOOT
+##    commands:
+##      - /sbin/reboot
+##      - /sbin/poweroff
+
+hbac_sudo_runas:
+  # Allow administrators to run any commands as root
+  # without a password.
+  #
+  - name: "%grp-sigaint-admins"
+    hosts:
+      - ALL
+    options:
+      - NOPASSWD
+    users:
+      - root
+    groups:
+      - operator
+    commands:
+      - ALL
+
+  # On Workstations and Laptops allow the user to run
+  # the following commands as root without a password.
+  # These machines are mostly treated as personal machines.
+  #
+  - name: "%grp-sigaint-users"
+    hosts:
+      - WORKSTATIONS
+    options:
+      - NOPASSWD
+    users:
+      - root
+    groups:
+      - operator
+    commands:
+      - ALL

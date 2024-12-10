@@ -16,23 +16,24 @@
       tags:
         - always
 
-    - ansible.builtin.include_tasks: "playbooks/dns.yaml"
-      when: configure_dns | default(true)
+    - block:
+      - ansible.builtin.import_tasks: "playbooks/dns.yaml"
+        when: configure_dns | default(true)
 
-    - ansible.builtin.include_tasks: "playbooks/motd.yaml"
-      when: configure_motd | default(true)
+      - ansible.builtin.import_tasks: "playbooks/motd.yaml"
+        when: configure_motd | default(true)
 
-    - ansible.builtin.include_tasks: "playbooks/skel.yaml"
-      when: configure_skel | default(true)
+      - ansible.builtin.import_tasks: "playbooks/skel.yaml"
+        when: configure_skel | default(true)
 
-    - ansible.builtin.include_tasks: "playbooks/sssd.yaml"
-      when: configure_sssd | default(true)
+      - ansible.builtin.import_tasks: "playbooks/sssd.yaml"
+        when: configure_sssd | default(true)
 
-    - ansible.builtin.include_tasks: "playbooks/sudoers.yaml"
-      when: configure_sudoers | default(true)
+      - ansible.builtin.import_tasks: "playbooks/sudoers.yaml"
+        when: configure_sudoers | default(true)
 
-    - ansible.builtin.include_tasks: "playbooks/sshd.yaml"
-      when: configure_sshd | default(true)
+      - ansible.builtin.import_tasks: "playbooks/sshd.yaml"
+        when: configure_sshd | default(true)
 
-    - ansible.builtin.include_tasks: "playbooks/baseline.yaml"
-      when: configure_baseline | default(true)
+      - ansible.builtin.import_tasks: "playbooks/baseline.yaml"
+        when: configure_baseline | default(true)
