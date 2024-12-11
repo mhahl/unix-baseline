@@ -1,0 +1,17 @@
+---
+- name:
+  tags:
+    - moonlight
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:3000/api/v1/machines/check_in"
+    method: POST
+    body_format: json
+    status_code: 204
+    body: |
+      {
+        "machine": {
+          "uuid": "{{ ansible_fqdn }}",
+          "token": "{{ansible_facts['machine_id']}}",
+          "ansible_facts": {{ ansible_facts | to_json }},
+        }
+      }

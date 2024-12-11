@@ -1,4 +1,7 @@
 ---
+# http://127.0.0.1:3000/api/v1/machines/check_in"
+moonlight_api: "https:/moonlight.sigaint.au/api/v1/machines/check_in"
+
 dns_search:
   - sigaint.au
 
