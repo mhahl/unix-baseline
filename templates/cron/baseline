@@ -1,1 +1,1 @@
-*/30 * * * * root /usr/local/bin/ansible-pull -U https://git.sr.ht/~mhahl/sigaint-freebsd-baseline baseline.yaml --clean --vault-pass-file /var/db/baseline/.credentials >/dev/null 2>&1
+*/30 * * * * root /usr/local/bin/ansible-pull -U https://github.com/mhahl/freebsd-baseline.git baseline.yaml --clean --vault-pass-file /var/db/baseline/.credentials >/dev/null 2>&1
