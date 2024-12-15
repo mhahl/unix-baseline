@@ -1,4 +1,13 @@
 ---
+- name: freebsd-baseline | timezone | remove localtime if not a symlink
+  ansible.builtin.file:
+    src: "/etc/localtime"
+    state: absent
+  when: "{{ '/etc/localtime' is not ansible.builtin.link}}"
+  tags:
+    - baseline:timezone
+    - baseline:timezone:configure
+
 - name: freebsd-baseline | timezone | set timezone
   ansible.builtin.file:
     src: "/usr/share/zoneinfo/{{ timezone }}"
