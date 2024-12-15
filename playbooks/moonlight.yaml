@@ -1,5 +1,6 @@
 ---
-- name:
+- name: "moonlight checkin"
+  failed_when: false
   tags:
     - moonlight
   ansible.builtin.uri:
@@ -7,7 +8,6 @@
     method: POST
     body_format: json
     status_code: 204
-    failed_when: false
     body: |
       {
         "machine": {
