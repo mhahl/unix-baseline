@@ -1,9 +1,18 @@
 ---
+
+- name: freebsd-baseline | timezone | get file stats
+  ansible.builtin.stat:
+    path: /etc/localtime
+  register: sym
+  tags:
+    - baseline:timezone
+    - baseline:timezone:configure
+
 - name: freebsd-baseline | timezone | remove localtime if not a symlink
   ansible.builtin.file:
-    src: "/etc/localtime"
+    path: "/etc/localtime"
     state: absent
-  when: "{{ '/etc/localtime' is not ansible.builtin.link}}"
+  when: sym.stat.islnk is defined and not sym.stat.islnk
   tags:
     - baseline:timezone
     - baseline:timezone:configure
