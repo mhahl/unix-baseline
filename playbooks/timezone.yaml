@@ -1,0 +1,9 @@
+---
+- name: freebsd-baseline | timezone | set timezone
+  ansible.builtin.file:
+    src: "/usr/share/zoneinfo/{{ timezone }}"
+    dest: /etc/localtime
+    state: link
+  tags:
+    - baseline:timezone
+    - baseline:timezone:configure

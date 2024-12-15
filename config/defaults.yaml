@@ -1,16 +1,26 @@
 ---
 # http://127.0.0.1:3000/api/v1/machines/check_in"
-moonlight_api: "https:/moonlight.sigaint.au/api/v1/machines/check_in"
+moonlight_api: "https://moonlight.ts.sigaint.au/api/v1/machines/check_in"
 
 dns_search:
   - sigaint.au
+  - ts.sigaint.au
+
+# Set system timezone
+timezone: "Australia/Sydney"
 
 # Quad 9 and Cloudflare DNS as a backup.
 dns_servers:
   - 9.9.9.9
-  - 1.1.1.1
+  - 149.112.112.112
   - 2620:fe::fe
   - 2620:fe::9
+
+ntp_servers:
+  - time1.google.com
+  - time2.google.com
+  - time3.google.com
+  - time4.google.com
 
 # Fetch the ssh keys for the users here
 user_ssh_keys:

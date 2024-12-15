@@ -1,0 +1,16 @@
+# NTP servers to use
+{% for server in ntp_servers %}
+server {{server}} iburst
+{% endfor %}
+
+# Access restrictions
+restrict default limited kod nomodify notrap nopeer noquery
+restrict -6 default limited kod nomodify notrap nopeer noquery
+restrict 127.0.0.1
+restrict -6 ::1
+
+# Drift file
+driftfile /var/db/ntp.drift
+
+# Logging
+logfile /var/log/ntp.log

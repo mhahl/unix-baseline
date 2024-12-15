@@ -12,6 +12,7 @@
     src: "../templates/{{ item.template }}"
     dest: "{{ item.dest }}"
     mode: "{{ item.mode }}"
+  notify: "restart sssd"
   with_items:
     - { template: sssd/sssd.conf.j2, dest: /usr/local/etc/sssd/sssd.conf, mode: "0600" }
     - { template: pam/system, dest: /etc/pam.d/system, mode: "0644" }

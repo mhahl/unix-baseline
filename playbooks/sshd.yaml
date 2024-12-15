@@ -4,6 +4,7 @@
     src: "../templates/{{ item.template }}"
     dest: "{{ item.dest }}"
     mode: "{{ item.mode }}"
+  notify: "restart sshd"
   tags:
     - baseline:sshd
     - baseline:sshd:configure

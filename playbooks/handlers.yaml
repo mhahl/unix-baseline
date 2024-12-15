@@ -1,0 +1,14 @@
+- name: restart sssd
+  ansible.builtin.service:
+    name: sssd
+    state: restarted
+
+- name: restart ntpd
+  ansible.builtin.service:
+    name: ntpd
+    state: restarted
+
+- name: restart sshd
+  ansible.builtin.service:
+    name: ntpd
+    state: restarted

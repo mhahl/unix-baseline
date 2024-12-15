@@ -4,10 +4,7 @@
     - config/defaults.yaml
     - config/secrets.yaml
   handlers:
-    - name: Restart sssd
-      ansible.builtin.service:
-        name: sssd
-        state: restarted
+    - ansible.builtin.include: "playbooks/handlers.yaml"
 
   tasks:
     # Include host vars if they exist
@@ -22,6 +19,12 @@
 
       - ansible.builtin.import_tasks: "playbooks/motd.yaml"
         when: configure_motd | default(true)
+
+      - ansible.builtin.import_tasks: "playbooks/timezone.yaml"
+        when: configure_timezone | default(true)
+
+      - ansible.builtin.import_tasks: "playbooks/ntp.yaml"
+        when: configure_ntp | default(true)
 
       - ansible.builtin.import_tasks: "playbooks/skel.yaml"
         when: configure_skel | default(true)

@@ -3,10 +3,11 @@
   tags:
     - moonlight
   ansible.builtin.uri:
-    url: "http://127.0.0.1:3000/api/v1/machines/check_in"
+    url: "{{moonlight_api}}"
     method: POST
     body_format: json
     status_code: 204
+    failed_when: false
     body: |
       {
         "machine": {
