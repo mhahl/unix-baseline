@@ -12,3 +12,8 @@
   ansible.builtin.service:
     name: ntpd
     state: restarted
+
+- name: restart syslog
+  ansible.builtin.service:
+    name: syslogd
+    state: restarted

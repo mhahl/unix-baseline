@@ -9,6 +9,9 @@ dns_search:
 # Set system timezone
 timezone: "Australia/Sydney"
 
+# Set the default syslog server
+syslog_server: "victoria.ts.sigaint.au"
+
 # Quad 9 and Cloudflare DNS as a backup.
 dns_servers:
   - 9.9.9.9

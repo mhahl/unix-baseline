@@ -41,6 +41,9 @@
       - ansible.builtin.import_tasks: "playbooks/baseline.yaml"
         when: configure_baseline | default(true)
 
+      - ansible.builtin.import_tasks: "playbooks/syslog.yaml"
+        when: configure_syslog | default(true)
+
       - ansible.builtin.import_tasks: "playbooks/moonlight.yaml"
         tags:
           - always
