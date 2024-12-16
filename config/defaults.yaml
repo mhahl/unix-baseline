@@ -12,12 +12,12 @@ timezone: "Australia/Sydney"
 # Set the default syslog server
 syslog_server: "victoria.ts.sigaint.au"
 
-# Quad 9 and Cloudflare DNS as a backup.
+# NextDNS
 dns_servers:
-  - 9.9.9.9
-  - 149.112.112.112
-  - 2620:fe::fe
-  - 2620:fe::9
+  - 45.90.28.189
+  - 45.90.30.189
+  - 2a07:a8c0::2a:b561
+  - 2a07:a8c1::2a:b561
 
 ntp_servers:
   - time1.google.com

@@ -21,4 +21,3 @@ echo "Applying baseline"
 ansible-pull -U https://git.sr.ht/~mhahl/sigaint-freebsd-baseline baseline.yaml --clean --vault-pass-file /var/db/baseline/.credentials
 
 
-
