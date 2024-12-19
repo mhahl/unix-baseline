@@ -10,7 +10,7 @@ dns_search:
 timezone: "Australia/Sydney"
 
 # Set the default syslog server
-syslog_server: "victoria.ts.sigaint.au"
+syslog_server: "ingest.logs.sigaint.au:2514"
 
 # NextDNS
 dns_servers:
