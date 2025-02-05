@@ -1,4 +1,11 @@
 ---
+- name: baseline-freebsd | baseline | create directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - /usr/local/etc/pkg/repos/
+
 - name: baseline-freebsd | baseline | deploy file templates
   ansible.builtin.template:
     src: "../templates/{{ item.template }}"
