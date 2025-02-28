@@ -1,1 +1,1 @@
-*/30 * * * * root {{ansible_pull_bin}} -U https://github.com/mhahl/sigaint-soe.git baseline.yaml --clean --vault-pass-file /var/db/baseline/.credentials >/dev/null 2>&1
+*/30 * * * * root {{ansible_pull_bin}} -U https://github.com/mhahl/freebsd-baseline baseline.yaml --clean --vault-pass-file /var/db/baseline/.credentials >/dev/null 2>&1
