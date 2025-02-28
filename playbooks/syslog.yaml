@@ -1,2 +1,2 @@
 ---
-- ansible.builtin.import_tasks: "syslog/{{ansible_facts['ansible_distribution'] | lower}}.yaml"
+- ansible.builtin.include_tasks: "syslog/{{ansible_facts['ansible_distribution'] | lower}}.yaml"
