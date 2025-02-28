@@ -1,2 +1,2 @@
 - ansible.builtin.include_tasks: "repos/pkg_freebsd.yaml"
-  when: ansible_facts['ansible_distribution'].lower() in ['freebsd']
+  when: "{{ ansible_distribution | lower in ['freebsd']}}"

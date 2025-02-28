@@ -4,7 +4,7 @@
 # but on fedora we want to configure systemd-resolved with DNSoverTLS instead.
 #
 - ansible.builtin.include_tasks: "dns/resolv_conf.yaml"
-  when: ansible_facts['ansible_distribution'].lower() in ['freebsd']
+  when: "{{ ansible_distribution | lower in ['freebsd']}}"
 
 - ansible.builtin.include_tasks: "dns/systemd_resolved.yaml"
-  when: ansible_facts['ansible_distribution'].lower() in ['fedora']
+  when: "{{ ansible_distribution | lower in ['fedora']}}"

@@ -1,2 +1,2 @@
 ---
-- ansible.builtin.include_tasks: "auth/{{ansible_facts['ansible_distribution'] | lower}}.yaml"
+- ansible.builtin.include_tasks: "auth/{{ansible_distribution | lower}}.yaml"
