@@ -1,0 +1,10 @@
+[Unit]
+Description=Apply system baseline
+Wants=baseline.timer
+
+[Service]
+Type=oneshot
+ExecStart={{ansible_pull_bin}} -U https://github.com/mhahl/freebsd-baseline baseline.yaml --clean --vault-pass-file /var/db/baseline/.credentials
+
+[Install]
+WantedBy=multi-user.target
