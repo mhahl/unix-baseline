@@ -36,6 +36,6 @@ elif [ "$platform" = 'freebsd' ]; then
 fi
 
 echo "Applying baseline"
-ansible-pull -U https://github.com/mhahl/freebsd-baseline --clean --vault-pass-file /var/db/baseline/.credentials
+ansible-pull -U https://github.com/mhahl/freebsd-baseline baseline.yaml --clean --vault-pass-file /var/db/baseline/.credentials
 
 

@@ -2,7 +2,6 @@
   ansible.builtin.service:
     name: sssd
     state: restarted
-
 - name: restart ntpd
   ansible.builtin.service:
     name: ntpd

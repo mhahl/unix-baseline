@@ -6,7 +6,7 @@
     - "config/defaults.yaml"
     - "config/secrets.yaml"
   handlers:
-    - ansible.builtin.include: "playbooks/handlers.yaml"
+    - include_tasks: "playbooks/handlers.yaml"
 
   tasks:
     # Include host vars if they exist
