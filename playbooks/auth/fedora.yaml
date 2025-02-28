@@ -10,7 +10,7 @@
 
 - name: sigaint-soe | auth | deploy templates
   ansible.builtin.template:
-    src: "../templates/{{ item.template }}"
+    src: "../../templates/{{ item.template }}"
     dest: "{{ item.dest }}"
     mode: "{{ item.mode }}"
   notify: "restart sssd"
