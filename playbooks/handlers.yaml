@@ -8,6 +8,11 @@
     name: ntpd
     state: restarted
 
+- name: restart chronyd
+  ansible.builtin.service:
+    name: chronyd
+    state: restarted
+
 - name: restart sshd
   ansible.builtin.service:
     name: ntpd
@@ -16,4 +21,9 @@
 - name: restart syslog
   ansible.builtin.service:
     name: syslogd
+    state: restarted
+
+- name: restart rsyslog
+  ansible.builtin.service:
+    name: rsyslog
     state: restarted

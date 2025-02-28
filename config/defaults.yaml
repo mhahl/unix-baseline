@@ -2,6 +2,11 @@
 # http://127.0.0.1:3000/api/v1/machines/check_in"
 moonlight_api: "https://moonlight.ts.sigaint.au/api/v1/machines/check_in"
 
+# Only these distributions are supported
+sigaint_soe_supported_distributions:
+  - FreeBSD
+  - Fedora
+
 dns_search:
   - sigaint.au
   - ts.sigaint.au
@@ -12,8 +17,20 @@ timezone: "Australia/Sydney"
 # Set the default syslog server
 syslog_server: "ingest.logs.sigaint.au:2514"
 
-# NextDNS
-dns_servers:
+# When using systemd-resolvd we set these
+# in the  /etc/systemd/resolved.conf
+# and use DNSOverTLS
+#
+systemd_resolved_dns:
+  - "45.90.28.0#2ab561.dns.nextdns.io"
+  - "2a07:a8c0::#2ab561.dns.nextdns.io"
+  - "2a07:a8c0::#2ab561.dns.nextdns.io"
+  - "2a07:a8c1::#2ab561.dns.nextdns.io"
+
+# When using resolv.conf we use these
+# nameservers. Mostly for FreeBSD
+#
+resolv_conf_dns:
   - 45.90.28.189
   - 45.90.30.189
   - 2a07:a8c0::2a:b561

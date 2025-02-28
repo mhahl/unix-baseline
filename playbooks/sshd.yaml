@@ -1,5 +1,5 @@
 ---
-- name: baseline-freebsd | sshd | deploy file templates
+- name: sigaint-soe | sshd | deploy file templates
   ansible.builtin.template:
     src: "../templates/{{ item.template }}"
     dest: "{{ item.dest }}"
@@ -11,7 +11,7 @@
   with_items:
     - { template: ssh/sshd_config, dest: /etc/ssh/sshd_config, mode: "0644" }
 
-- name: baseline-freebsd | sshd | download ssh keys
+- name: sigaint-soe | sshd | download ssh keys
   ansible.builtin.get_url:
     url: "{{ item.url }}"
     dest: /home/{{ item.name }}/.ssh/authorized_keys

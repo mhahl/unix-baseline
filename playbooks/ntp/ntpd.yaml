@@ -1,0 +1,21 @@
+---
+- name: sigaint-soe | ntp | deploy file templates
+  ansible.builtin.template:
+    src: "../templates/{{ item.template }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  notify: "restart ntpd"
+  tags:
+    - baseline:ntp
+    - baseline:ntp:configure
+  with_items:
+    - { template: ntp/ntp.conf.j2, dest: /etc/ntp.conf, mode: "0644" }
+
+- name: sigaint-soe | ntp | start services
+  ansible.builtin.service:
+    name: "ntpd"
+    state: started
+    enabled: true
+  tags:
+    - baseline:ntp
+    - baseline:ntp:configure

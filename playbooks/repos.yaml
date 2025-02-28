@@ -1,0 +1,2 @@
+- ansible.builtin.import_tasks: "repos/pkg_freebsd.yaml"
+  when: ansible_distribution in ['FreeBSD']

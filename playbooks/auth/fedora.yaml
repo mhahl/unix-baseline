@@ -1,0 +1,36 @@
+---
+- name: sigaint-soe | auth | install packages
+  ansible.builtin.package:
+    name:
+      - sssd
+      - sssd-ldap
+  tags:
+    - baseline:ssd
+    - baseline:ssd:packages
+
+- name: sigaint-soe | auth | deploy templates
+  ansible.builtin.template:
+    src: "../templates/{{ item.template }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  notify: "restart sssd"
+  with_items:
+    - { template: sssd/sssd.conf.j2, dest: /etc/sssd/sssd.conf, mode: "0600" }
+
+- name: sigaint-soe | auth | start services
+  ansible.builtin.service:
+    name: "sssd"
+    state: started
+    enabled: true
+
+- name: sigaint-soe | auth | get current authselect profile
+  shell: /usr/bin/authselect current
+  register: authselect
+
+- name: sigaint-soe | auth | set authselect profile 'sssd'
+  command: "{{ item }}"
+  notify: "restart sssd"
+  loop:
+    - authselect select sssd --force
+    - authselect select sssd with-mkhomedir
+  when: authselect.stdout.find('sssd') == -1

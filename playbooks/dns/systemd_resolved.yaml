@@ -1,0 +1,14 @@
+---
+- name: sigaint-soe | Configure DNS
+  block:
+    - name: dns | Configure systemd-resolved nameservers
+      ansible.builtin.template:
+        src: "../../templates/dns/resolved.conf.j2"
+        dest: "/etc/systemd/resolved.conf"
+        mode: "0644"
+        owner: "root"
+        group: "root"
+      tags:
+        - baseline:dns
+        - baseline:dns:configure
+        - baseline:dns:systemd

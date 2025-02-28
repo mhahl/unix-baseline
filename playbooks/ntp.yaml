@@ -1,21 +1,7 @@
 ---
-- name: baseline-freebsd | ntp | deploy file templates
-  ansible.builtin.template:
-    src: "../templates/{{ item.template }}"
-    dest: "{{ item.dest }}"
-    mode: "{{ item.mode }}"
-  notify: "restart ntpd"
-  tags:
-    - baseline:ntp
-    - baseline:ntp:configure
-  with_items:
-    - { template: ntp/ntp.conf.j2, dest: /etc/ntp.conf, mode: "0644" }
 
-- name: baseline-freebsd | ntp | start services
-  ansible.builtin.service:
-    name: "ntpd"
-    state: started
-    enabled: true
-  tags:
-    - baseline:ntp
-    - baseline:ntp:configure
+- ansible.builtin.import_tasks: "ntp/ntp.yaml"
+  when: ansible_distribution in ['FreeBSD']
+
+- ansible.builtin.import_tasks: "ntp/chrony.yaml"
+  when: ansible_distribution in ['Fedora']

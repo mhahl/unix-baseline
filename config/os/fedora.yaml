@@ -1,0 +1,4 @@
+sssd_default_shell: /usr/bin/bash
+sssd_override_shell: /usr/bin/bash
+ansible_pull_bin: /usr/bin/ansible-pull
+sudoers_path: /etc/sudoers

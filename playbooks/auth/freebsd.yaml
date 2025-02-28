@@ -1,5 +1,5 @@
 ---
-- name: freebsd-baseline | sssd | install packages
+- name: sigaint-soe | sssd | install packages
   ansible.builtin.package:
     name:
       - sssd2
@@ -7,7 +7,7 @@
     - baseline:ssd
     - baseline:ssd:packages
 
-- name: freebsd-baseline | sssd | deploy templates
+- name: sigaint-soe | sssd | deploy templates
   ansible.builtin.template:
     src: "../templates/{{ item.template }}"
     dest: "{{ item.dest }}"
@@ -19,7 +19,7 @@
     - { template: pam/sshd, dest: /etc/pam.d/sshd, mode: "0644" }
     - { template: nsswitch/nsswitch.conf, dest: /etc/nsswitch.conf, mode: "0644" }
 
-- name: baseline-freebsd | sssd | start services
+- name: sigaint-soe | sssd | start services
   ansible.builtin.service:
     name: "sssd"
     state: started

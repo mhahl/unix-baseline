@@ -1,8 +1,10 @@
 ---
 - hosts: localhost
   vars_files:
-    - config/defaults.yaml
-    - config/secrets.yaml
+    # Make sure we load the correct distrib
+    - "config/os/{{ansible_distribution | lower}}.yaml"
+    - "config/defaults.yaml"
+    - "config/secrets.yaml"
   handlers:
     - ansible.builtin.include: "playbooks/handlers.yaml"
 
@@ -14,6 +16,9 @@
         - always
 
     - block:
+      - ansible.builtin.import_tasks: "playbooks/repos.yaml"
+        when: configure_repos | default(true)
+
       - ansible.builtin.import_tasks: "playbooks/dns.yaml"
         when: configure_dns | default(true)
 
@@ -29,7 +34,7 @@
       - ansible.builtin.import_tasks: "playbooks/skel.yaml"
         when: configure_skel | default(true)
 
-      - ansible.builtin.import_tasks: "playbooks/sssd.yaml"
+      - ansible.builtin.import_tasks: "playbooks/auth.yaml"
         when: configure_sssd | default(true)
 
       - ansible.builtin.import_tasks: "playbooks/sudoers.yaml"

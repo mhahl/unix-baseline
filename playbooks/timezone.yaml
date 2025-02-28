@@ -1,6 +1,6 @@
 ---
 
-- name: freebsd-baseline | timezone | get file stats
+- name: sigaint-soe | timezone | get file stats
   ansible.builtin.stat:
     path: /etc/localtime
   register: sym
@@ -8,7 +8,7 @@
     - baseline:timezone
     - baseline:timezone:configure
 
-- name: freebsd-baseline | timezone | remove localtime if not a symlink
+- name: sigaint-soe | timezone | remove localtime if not a symlink
   ansible.builtin.file:
     path: "/etc/localtime"
     state: absent
@@ -17,7 +17,7 @@
     - baseline:timezone
     - baseline:timezone:configure
 
-- name: freebsd-baseline | timezone | set timezone
+- name: sigaint-soe | timezone | set timezone
   ansible.builtin.file:
     src: "/usr/share/zoneinfo/{{ timezone }}"
     dest: /etc/localtime

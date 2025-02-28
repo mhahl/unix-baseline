@@ -1,0 +1,29 @@
+- name: sigaint-soe | syslog | deploy file templates
+  ansible.builtin.template:
+    src: "../templates/{{ item.template }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  notify: "restart syslog"
+  tags:
+    - baseline:syslog
+    - baseline:syslog:configure
+  with_items:
+    - { template: syslog/syslog.conf.j2, dest: /etc/syslog.conf, mode: "0644" }
+
+- name: sigaint-soe | rsyslog | add syslog args
+  ansible.builtin.lineinfile:
+    path: /etc/rc.conf
+    regexp: '^syslogd_flags='
+    line: 'syslogd_flags="-O syslog -v -v"'
+  tags:
+    - baseline:syslog
+    - baseline:syslog:configure
+
+- name: sigaint-soe | rsyslog | start services
+  ansible.builtin.service:
+    name: "syslogd"
+    state: started
+    enabled: true
+  tags:
+    - baseline:syslog
+    - baseline:syslog:configure
