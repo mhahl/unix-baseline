@@ -6,6 +6,8 @@
   tasks:
     # Include host vars if they exist
     - include_vars:
+        file: "{{item}}"
+      loop:
         - "config/defaults.yaml"
         - "/usr/local/etc/baseline/config.yaml"
         - "config/os/{{ansible_distribution | lower}}.yaml"
