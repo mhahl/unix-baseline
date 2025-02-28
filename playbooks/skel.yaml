@@ -1,3 +1,3 @@
 ---
 - ansible.builtin.import_tasks: "skel/freebsd.yaml"
-  when: ansible_distribution in ['FreeBSD']
+  when: ansible_facts['ansible_distribution'].lower() in ['freebsd']

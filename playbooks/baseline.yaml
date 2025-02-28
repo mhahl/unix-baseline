@@ -5,6 +5,5 @@
     src: "../templates/{{ item.template }}"
     dest: "{{ item.dest }}"
     mode: "{{ item.mode }}"
-  when: ansible_distribution in item.distribution
   with_items:
     - { template: cron/baseline, dest: /etc/cron.d/baseline, mode: "0644" }
