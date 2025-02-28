@@ -10,7 +10,7 @@
 
   tasks:
     # Include host vars if they exist
-    - ansible.builtin.include_vars: "/usr/local/etc/baseline/config.yaml"
+    - include_vars: "/usr/local/etc/baseline/config.yaml"
       failed_when: false
       tags:
         - always
