@@ -1,7 +1,7 @@
 ---
 
-- ansible.builtin.import_tasks: "ntp/ntp.yaml"
+- ansible.builtin.import_tasks: "playbooks/ntp/ntp.yaml"
   when: ansible_distribution in ['FreeBSD']
 
-- ansible.builtin.import_tasks: "ntp/chrony.yaml"
+- ansible.builtin.import_tasks: "playbooks/ntp/chrony.yaml"
   when: ansible_distribution in ['Fedora']
