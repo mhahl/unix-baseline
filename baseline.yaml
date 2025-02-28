@@ -2,7 +2,7 @@
 - hosts: localhost
   vars_files:
   handlers:
-    - include_tasks: "playbooks/handlers.yaml"
+    - import_tasks: "playbooks/handlers.yaml"
   tasks:
     # Include host vars if they exist
     - include_vars:
