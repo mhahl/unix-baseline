@@ -4,6 +4,8 @@
     name:
       - sssd
       - sssd-ldap
+      - odjob
+      - odjob-mkhomedir
   tags:
     - baseline:ssd
     - baseline:ssd:packages
@@ -26,6 +28,7 @@
 - name: sigaint-soe | auth | get current authselect profile
   shell: /usr/bin/authselect current
   register: authselect
+  changed_when: false
 
 - name: sigaint-soe | auth | set authselect profile 'sssd'
   command: "{{ item }}"
