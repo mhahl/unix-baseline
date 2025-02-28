@@ -1,7 +1,7 @@
 ---
 
 - import_tasks: "playbooks/ntp/ntpd.yaml"
-  when: ansible_distribution.include('FreeBSD')
+  when: ansible_facts['ansible_distribution'].lower() in ['freebsd']
 
 - import_tasks: "playbooks/ntp/chrony.yaml"
-  when: ansible_distribution.include('Fedora')
+  when: ansible_facts['ansible_distribution'].lower() in ['fedora']
