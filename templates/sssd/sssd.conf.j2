@@ -8,7 +8,9 @@ homedir_substring = /home
 
 [nss]
 default_shell = {{sssd_default_shell}}
-#override_shell = {{sssd_override_shell}}
+{% if ansible_distribution != 'FreeBSD' %}
+override_shell = {{sssd_override_shell}}
+{% endif %}
 
 [pam]
 
