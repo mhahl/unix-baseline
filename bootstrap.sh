@@ -22,16 +22,16 @@ chmod 0600 /var/db/baseline/.credentials
 if [ "$platform" = 'linux' ]; then
   dnf install -y ansible
 
-  cat > /etc/cron.d/baseline <<EOF
-  */30 * * * * root /usr/bin/ansible-pull -U https://github.com/mhahl/freebsd-baseline baseline.yaml --clean --vault-pass-file /var/db/baseline/.credentials >/dev/null 2>&1
-  EOF
+cat > /etc/cron.d/baseline <<EOF
+*/30 * * * * root /usr/bin/ansible-pull -U https://github.com/mhahl/freebsd-baseline baseline.yaml --clean --vault-pass-file /var/db/baseline/.credentials >/dev/null 2>&1
+EOF
 
 elif [ "$platform" = 'freebsd' ]; then
   pkg install py311-ansible py311-ansible-core
 
-  cat > /etc/cron.d/baseline <<EOF
-  */30 * * * * root /usr/local/bin/ansible-pull -U https://github.com/mhahl/freebsd-baseline baseline.yaml --clean --vault-pass-file /var/db/baseline/.credentials >/dev/null 2>&1
-  EOF
+cat > /etc/cron.d/baseline <<EOF
+*/30 * * * * root /usr/local/bin/ansible-pull -U https://github.com/mhahl/freebsd-baseline baseline.yaml --clean --vault-pass-file /var/db/baseline/.credentials >/dev/null 2>&1
+EOF
 
 fi
 
