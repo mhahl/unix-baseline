@@ -4,8 +4,8 @@
     name:
       - sssd
       - sssd-ldap
-      - odjob
-      - odjob-mkhomedir
+      - oddjob
+      - oddjob-mkhomedir
   tags:
     - baseline:ssd
     - baseline:ssd:packages
