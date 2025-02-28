@@ -21,9 +21,12 @@
 
 - name: sigaint-soe | auth | start services
   ansible.builtin.service:
-    name: "sssd"
+    name: "{{item}}"
     state: started
     enabled: true
+  loop:
+    - sssd
+    - oddjobd
 
 - name: sigaint-soe | auth | get current authselect profile
   shell: /usr/bin/authselect current
