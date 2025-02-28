@@ -2,7 +2,7 @@
 - hosts: localhost
   vars_files:
     # Make sure we load the correct distrib
-    - "config/os/{{ansible_distribution | lower}}.yaml"
+    - "config/os/{{ansible_facts['ansible_distribution'] | lower}}.yaml"
     - "config/defaults.yaml"
     - "config/secrets.yaml"
   handlers:
