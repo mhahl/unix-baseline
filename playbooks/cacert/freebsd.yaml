@@ -13,7 +13,7 @@
     dest: /usr/local/share/ca-certificates/ca.crt
     validate_certs: false
     mode: '0644'
-    when: cert.exists
+  when: cert.exists
   tags:
     - baseline:cacert
     - baseline:cacert:configure
