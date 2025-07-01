@@ -1,0 +1,3 @@
+---
+- ansible.builtin.include_tasks: "profile/linux.yaml"
+  when: "{{ baseline_os | lower in ['linux']}}"

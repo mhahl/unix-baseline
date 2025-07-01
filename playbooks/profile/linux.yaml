@@ -1,0 +1,11 @@
+---
+- name: sigaint-soe | profile | deploy profile
+  ansible.builtin.template:
+    src: "../templates/{{ item.template }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  with_items:
+    - { template: profile/profile.j2, dest: /etc/profile.d/baseline , mode: "0644" }
+  tags:
+    - baseline:profile
+    - baseline:profile:configure
