@@ -27,3 +27,7 @@
   ansible.builtin.service:
     name: rsyslog
     state: restarted
+
+- name: update-ca-trust
+  ansible.builtin.command:
+    cmd: /usr/bin/update-ca-trust

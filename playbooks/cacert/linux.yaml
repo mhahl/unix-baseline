@@ -13,6 +13,7 @@
     dest: /etc/pki/ca-trust/source/anchors/ca.crt
     validate_certs: false
     mode: '0644'
+  notify: update-ca-trust
   when: not cert.stat.exists
   tags:
     - baseline:cacert
