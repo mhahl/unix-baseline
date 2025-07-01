@@ -5,7 +5,7 @@
     dest: "{{ item.dest }}"
     mode: "{{ item.mode }}"
   with_items:
-    - { template: profile/profile.j2, dest: /etc/profile.d/baseline , mode: "0644" }
+    - { template: profile/profile.j2, dest: /etc/profile.d/baseline.sh , mode: "0644" }
   tags:
     - baseline:profile
     - baseline:profile:configure
