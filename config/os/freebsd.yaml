@@ -5,3 +5,5 @@ sssd_override_shell: /usr/local/bin/bash
 # On FreeBSD ansible-pull is located here
 ansible_pull_bin: /usr/local/bin/ansible-pull
 sudoers_path: /usr/local/etc/sudoers
+
+baseline_os: "freebsd"

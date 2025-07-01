@@ -1,20 +1,3 @@
 ---
-- name: sigaint-soe | sudoers | install packages
-  package:
-    name:
-      - sudo
-  tags:
-    - baseline:sudoers
-    - baseline:sudoers:packages
-
-- name: sigaint-soe | sudoers | deploy templates
-  ansible.builtin.template:
-    src: "../templates/{{ item.template }}"
-    dest: "{{ item.dest }}"
-    mode: "{{ item.mode }}"
-  tags:
-    - baseline:sudoers
-    - baseline:sudoers:configure
-  with_items:
-    # Sudo
-    - { template: sudoers/sudoers, dest: "{{sudoers_path}}", mode: "0440" }
+- ansible.builtin.include_tasks: "sudoers/freebsd.yaml"
+  when: "{{ baseline_os | lower in ['freebsd']}}"

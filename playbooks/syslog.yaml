@@ -1,2 +1,3 @@
 ---
-- ansible.builtin.include_tasks: "syslog/{{ansible_distribution | lower}}.yaml"
+- ansible.builtin.include_tasks: "syslog/{{baseline_os | lower}}.yaml"
+

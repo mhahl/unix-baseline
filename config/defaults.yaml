@@ -6,6 +6,7 @@ moonlight_api: "https://moonlight.ts.sigaint.au/api/v1/machines/check_in"
 sigaint_soe_supported_distributions:
   - FreeBSD
   - Fedora
+  - RedHat
 
 dns_search:
   - sigaint.au
@@ -43,17 +44,16 @@ ntp_servers:
   - time4.google.com
 
 # Fetch the ssh keys for the users here
+# FreeBSD Only.
+#
 user_ssh_keys:
   - { name: "mhahl", url: https://github.com/mhahl.keys }
 
 # Alias workstations to the hosts that are considered workstations.
-hbac_sudo_hosts:
-  - name: WORKSTATIONS
-    hosts:
-      - huon.sigaint.au
-      - pine.sigaint.au
-      - laptop*.sigaint.au
-      - workstation*.sigaint.au
+hbac_sudo_hosts: []
+#  - name: WORKSTATIONS
+#    hosts:
+#      - ws0124.corp.sigaint.au
 
 hbac_sudo_commands: []
 ##  - name: REBOOT

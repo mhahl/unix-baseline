@@ -1,0 +1,10 @@
+---
+- name: sigaint-soe | auth | install packages
+  ansible.builtin.package:
+    name:
+      - ipa-client
+      - oddjob
+      - oddjob-mkhomedir
+  tags:
+    - baseline:ssd
+    - baseline:ssd:packages

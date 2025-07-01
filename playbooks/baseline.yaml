@@ -1,2 +1,2 @@
 ---
-- ansible.builtin.include_tasks: "baseline/{{ansible_distribution | lower}}.yaml"
+- ansible.builtin.include_tasks: "baseline/{{baseline_os | lower}}.yaml"

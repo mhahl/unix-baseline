@@ -15,8 +15,19 @@
       failed_when: false
       tags:
         - always
+    # Always check if we are on a supported OS
+    - ansible.builtin.assert:
+        that:
+          - baseline_os
+        fail_msg: "{{baseline_os}} not supported."
+        success_msg: "{{baseline_os}} supported."
+      tags:
+        - always
 
     - block:
+      - ansible.builtin.include_tasks: "playbooks/cacert.yaml"
+        when: configure_cacert | default(true)
+
       - ansible.builtin.include_tasks: "playbooks/repos.yaml"
         when: configure_repos | default(true)
 
