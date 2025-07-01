@@ -1,0 +1,14 @@
+---
+- name: sigaint-soe | Configure DNS
+  block:
+    - name: dns | Configure nameservers
+      ansible.builtin.template:
+        src: "../../templates/dns/resolv.conf.j2"
+        dest: "/etc/resolv.conf"
+        mode: "0755"
+        owner: "root"
+        group: "wheel"
+      tags:
+        - baseline:dns
+        - baseline:dns:configure
+        - baseline:dns:resolv

@@ -1,0 +1,5 @@
+[Resolve]
+{% for dns in systemd_resolved_dns %}
+DNS={{dns}}
+{%endfor%}
+DNSOverTLS=yes

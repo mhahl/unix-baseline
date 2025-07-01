@@ -7,8 +7,10 @@ domains = LDAP
 homedir_substring = /home
 
 [nss]
-default_shell = /usr/local/bin/bash
-#override_shell = /usr/local/bin/bash
+default_shell = {{sssd_default_shell}}
+{% if ansible_distribution != 'FreeBSD' %}
+override_shell = {{sssd_override_shell}}
+{% endif %}
 
 [pam]
 
@@ -25,7 +27,7 @@ chpass_provider = ldap
 # the "member" attribute. If you do not know this value, ask your LDAP
 # administrator.
 ldap_schema = rfc2307
-ldap_uri = ldaps://ldap.v6.sigaint.au, ldaps://ldap.v4.sigaint.au
+ldap_uri = ldaps://ipa-1.syd.sigaint.au, ldaps://ipa-2.syd.sigaint.au, ldaps://ipa-3.syd.sigaint.au
 
 ldap_search_base = dc=sigaint,dc=au
 ldap_id_use_start_tls = true

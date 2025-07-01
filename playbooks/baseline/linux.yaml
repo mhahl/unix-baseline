@@ -1,0 +1,15 @@
+- name: sigaint-soe | baseline | deploy file templates
+  ansible.builtin.template:
+    src: "../templates/{{ item.template }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  with_items:
+    - { template: baseline/baseline.service.j2, dest: /etc/systemd/system/baseline.service, mode: "0644" }
+    - { template: baseline/baseline.timer.j2, dest: /etc/systemd/system/baseline.timer, mode: "0644" }
+
+- name: sigaint-soe | baseline | enable baseline timer
+  systemd:
+    daemon_reload: true
+    name: baseline.timer
+    enabled: true
+    state: started

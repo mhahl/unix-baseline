@@ -1,0 +1,24 @@
+---
+- name: sigaint-soe | rsyslog | install packages
+  ansible.builtin.package:
+    name:
+      - rsyslog
+  tags:
+    - baseline:rsyslog
+    - baseline:rsyslog:packages
+
+- name: sigaint-soe | rsyslog | deploy templates
+  ansible.builtin.template:
+    src: "../templates/{{ item.template }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  notify: "restart rsyslog"
+  with_items:
+    - { template: syslog/rsyslog.conf.j2, dest: /etc/rsyslog.conf , mode: "0644" }
+
+- name: sigaint-soe | rsyslog | start services
+  ansible.builtin.service:
+    name: "rsyslog"
+    state: started
+    enabled: true
+

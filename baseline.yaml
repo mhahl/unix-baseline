@@ -1,49 +1,66 @@
 ---
 - hosts: localhost
   vars_files:
-    - config/defaults.yaml
-    - config/secrets.yaml
   handlers:
-    - ansible.builtin.include: "playbooks/handlers.yaml"
-
+    - import_tasks: "playbooks/handlers.yaml"
   tasks:
     # Include host vars if they exist
-    - ansible.builtin.include_vars: "/usr/local/etc/baseline/config.yaml"
+    - include_vars:
+        file: "{{item}}"
+      loop:
+        - "config/defaults.yaml"
+        - "/usr/local/etc/baseline/config.yaml"
+        - "config/os/{{ansible_distribution | lower}}.yaml"
+        - "config/secrets.yaml"
       failed_when: false
+      tags:
+        - always
+    # Always check if we are on a supported OS
+    - ansible.builtin.assert:
+        that:
+          - baseline_os
+        fail_msg: "{{baseline_os}} not supported."
+        success_msg: "{{baseline_os}} supported."
       tags:
         - always
 
     - block:
-      - ansible.builtin.import_tasks: "playbooks/dns.yaml"
+      - ansible.builtin.include_tasks: "playbooks/cacert.yaml"
+        when: configure_cacert | default(true)
+
+      - ansible.builtin.include_tasks: "playbooks/repos.yaml"
+        when: configure_repos | default(true)
+
+      - ansible.builtin.include_tasks: "playbooks/dns.yaml"
         when: configure_dns | default(true)
 
-      - ansible.builtin.import_tasks: "playbooks/motd.yaml"
+      - ansible.builtin.include_tasks: "playbooks/motd.yaml"
         when: configure_motd | default(true)
 
-      - ansible.builtin.import_tasks: "playbooks/timezone.yaml"
+      - ansible.builtin.include_tasks: "playbooks/timezone.yaml"
         when: configure_timezone | default(true)
 
-      - ansible.builtin.import_tasks: "playbooks/ntp.yaml"
+      - ansible.builtin.include_tasks: "playbooks/ntp.yaml"
         when: configure_ntp | default(true)
 
-      - ansible.builtin.import_tasks: "playbooks/skel.yaml"
+      - ansible.builtin.include_tasks: "playbooks/skel.yaml"
         when: configure_skel | default(true)
 
-      - ansible.builtin.import_tasks: "playbooks/sssd.yaml"
+      - ansible.builtin.include_tasks: "playbooks/auth.yaml"
         when: configure_sssd | default(true)
 
-      - ansible.builtin.import_tasks: "playbooks/sudoers.yaml"
+      - ansible.builtin.include_tasks: "playbooks/sudoers.yaml"
         when: configure_sudoers | default(true)
 
-      - ansible.builtin.import_tasks: "playbooks/sshd.yaml"
+      - ansible.builtin.include_tasks: "playbooks/sshd.yaml"
         when: configure_sshd | default(true)
 
-      - ansible.builtin.import_tasks: "playbooks/baseline.yaml"
+      - ansible.builtin.include_tasks: "playbooks/baseline.yaml"
         when: configure_baseline | default(true)
 
-      - ansible.builtin.import_tasks: "playbooks/syslog.yaml"
+      - ansible.builtin.include_tasks: "playbooks/syslog.yaml"
         when: configure_syslog | default(true)
 
-      - ansible.builtin.import_tasks: "playbooks/moonlight.yaml"
+      - ansible.builtin.include_tasks: "playbooks/moonlight.yaml"
         tags:
           - always

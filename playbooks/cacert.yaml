@@ -1,0 +1,3 @@
+---
+- ansible.builtin.include_tasks: "cacert/{{baseline_os | lower}}.yaml"
+

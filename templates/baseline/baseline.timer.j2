@@ -1,0 +1,10 @@
+[Unit]
+Description=Apply system baseline.
+Requires=baseline.service
+
+[Timer]
+Unit=baseline.service
+OnCalendar=*:0/30
+
+[Install]
+WantedBy=timers.target

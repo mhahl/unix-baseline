@@ -1,7 +1,7 @@
 # Baseline
 You know you want to run it, so why not just do it?
 ```
-curl https://git.sr.ht/~mhahl/sigaint-freebsd-baseline/blob/master/bootstrap.sh | bash -s
+curl https://git.sr.ht/~mhahl/sigaint-sigaint-soe/blob/master/bootstrap.sh | bash -s
 ```
 
 ## Installation
