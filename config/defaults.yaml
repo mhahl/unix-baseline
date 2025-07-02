@@ -16,7 +16,7 @@ dns_search:
 timezone: "Australia/Sydney"
 
 # Set the default syslog server
-syslog_server: "ingest.logs.sigaint.au:2514"
+syslog_server: "syslog.v4.dmz.sigaint.au:2514"
 
 # When using systemd-resolvd we set these
 # in the  /etc/systemd/resolved.conf

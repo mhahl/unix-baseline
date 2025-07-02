@@ -1,6 +1,7 @@
 [Unit]
 Description=Apply system baseline
 Wants=baseline.timer
+After=network-online.target
 
 [Service]
 Type=oneshot
