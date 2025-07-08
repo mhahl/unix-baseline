@@ -25,7 +25,7 @@
 
 - name: restart auditd
   ansible.builtin.command:
-    cmd: /usr/sbin/service restart auditd
+    cmd: "/usr/sbin/service stop auditd && /usr/bin/systemctl start auditd"
 
 - name: restart rsyslog
   ansible.builtin.service:
