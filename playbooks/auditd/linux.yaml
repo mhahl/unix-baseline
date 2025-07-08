@@ -1,0 +1,59 @@
+---
+- name: sigaint-soe | auditd | install packages
+  ansible.builtin.package:
+    name:
+      - audispd-plugins
+  notify: "restart auditd"
+  tags:
+    - baseline:auditd
+    - baseline:auditd:packages
+
+- name: sigaint-soe | auditd | configure
+  block:
+    - name: auditd | Configure auditd plugins
+      ansible.builtin.template:
+        src: "../../templates/auditd/plugins.d/syslog.conf.j2"
+        dest: "/etc/audit/plugins.d/syslog.conf"
+        mode: "0640"
+        owner: "root"
+        group: "root"
+      notify: augenrules
+      tags:
+        - baseline:auditd
+        - baseline:auditd:configureau
+        - baseline:auditd:plugins
+
+- name: sigaint-soe | auditd | rules
+  block:
+    - name: auditd | Configure auditd plugins
+      ansible.builtin.template:
+        src: "../../templates/auditd/rules.d/{{item}}"
+        dest: "/etc/audit/rules.d/{{item}}"
+        mode: "0640"
+        owner: "root"
+        group: "root"
+      notify: augenrules
+      with_items:
+        - "10-base-config.rules"
+        - "30-actions.rules"
+        - "31-audit_rules_usergroup_modification.rules"
+        - "32-activity.rules"
+        - "33-access.rules"
+        - "34-delete.rules"
+        - "35-logins.rules"
+        - "36-session.rules"
+        - "70-system_local.rules"
+        - "71-MAC_policy.rules"
+        - "72-maintenance.rules"
+        - "73-modules.rules"
+        - "73-mounts.rules"
+        - "74-perm_mod.rules"
+        - "75-privileged.rules"
+        - "76-setgid.rules"
+        - "77-setuid.rules"
+        - "78-time_change.rules"
+        - "99-finalize.rules"
+      tags:
+        - baseline:auditd
+        - baseline:auditd:configure
+        - baseline:auditd:rules

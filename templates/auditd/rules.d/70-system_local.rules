@@ -1,0 +1,56 @@
+## CIS 4.1.5 Ensure events that modify the system's network environment are collected
+## Record changes to network environment files or system calls.
+
+## xccdf_org.ssgproject.content_rule_audit_rules_networkconfig_modification
+## Record Events that Modify the System's Network Environment
+## The network environment should not be modified by anything other than administrator action. Any change to network
+## parameters should be audited.
+
+## -a always,exit -F arch=ARCH -S sethostname,setdomainname -F key=audit_rules_networkconfig_modification
+## -w /etc/issue -p wa -k audit_rules_networkconfig_modification
+## -w /etc/issue.net -p wa -k audit_rules_networkconfig_modification
+## -w /etc/hosts -p wa -k audit_rules_networkconfig_modification
+## -w /etc/sysconfig/network -p wa -k audit_rules_networkconfig_modification
+
+##-a always,exit -F arch=b32 -S sethostname -S setdomainname -k system-locale
+##-a always,exit -F arch=b64 -S sethostname -S setdomainname -k system-locale
+
+##-w /etc/issue -p wa -k system-locale
+
+##-w /etc/issue.net -p wa -k system-locale
+
+##-w /etc/hosts -p wa -k system-locale
+
+## Not covered by STIG
+-w /etc/sysconfig/network -p wa -k system-locale
+
+## STIG
+
+-a always,exit -F arch=b32 -S sethostname,setdomainname -F key=system-locale
+-a always,exit -F arch=b64 -S sethostname,setdomainname -F key=system-locale
+
+-a always,exit -F arch=b32 -F path=/etc/issue -F perm=wa -F key=system-locale
+-a always,exit -F arch=b64 -F path=/etc/issue -F perm=wa -F key=system-locale
+
+-a always,exit -F arch=b32 -F path=/etc/issue.net -F perm=wa -F key=system-locale
+-a always,exit -F arch=b64 -F path=/etc/issue.net -F perm=wa -F key=system-locale
+
+-a always,exit -F arch=b32 -F path=/etc/hosts -F perm=wa -F key=system-locale
+-a always,exit -F arch=b64 -F path=/etc/hosts -F perm=wa -F key=system-locale
+
+-a always,exit -F arch=b32 -F path=/etc/hostname -F perm=wa -F key=system-locale
+-a always,exit -F arch=b64 -F path=/etc/hostname -F perm=wa -F key=system-locale
+
+## Not covered by CIS Level 2
+-a always,exit -F arch=b32 -F dir=/etc/NetworkManager/ -F perm=wa -F key=system-locale
+-a always,exit -F arch=b64 -F dir=/etc/NetworkManager/ -F perm=wa -F key=system-locale
+
+## Audit every attempt to read or modify the sshd_config file
+-a always,exit -F arch=b32 -F path=/etc/ssh/sshd_config -F perm=warx -F key=system-locale
+-a always,exit -F arch=b64 -F path=/etc/ssh/sshd_config -F perm=warx -F key=system-locale
+
+## CCE-80941-8	Record Access Events to Audit Log Directory
+## The audit system should collect access events to read audit log directory.
+## The following audit rule will assure that access to audit log directory are collected.
+-a always,exit -F dir=/var/log/audit/ -F perm=r -F auid>=1000 -F auid!=unset -F key=system-locale
+
