@@ -2,7 +2,7 @@
 - name: sigaint-soe | sudoers | install packages
   package:
     name:
-      - sudo
+      - sudo-sssd
   tags:
     - baseline:sudoers
     - baseline:sudoers:packages
