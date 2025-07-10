@@ -1,6 +1,6 @@
 search {{dns_search | join(' ') }}
 
-{% for server in dns_servers %}
+{% for server in resolv_conf_dns %}
 nameserver {{server}}
 {%endfor%}
 
