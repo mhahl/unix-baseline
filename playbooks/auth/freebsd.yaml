@@ -3,7 +3,7 @@
   ansible.builtin.package:
     name:
       - sssd2
-      - sssd-sudo
+      - sudo-sssd
       - krb5
       - cyrus-sasl
       - cyrus-sasl-gssapi
@@ -25,6 +25,7 @@
     - { template: pam/system, dest: /etc/pam.d/system, mode: "0644" }
     - { template: pam/sshd, dest: /etc/pam.d/sshd, mode: "0644" }
     - { template: nsswitch/nsswitch.conf, dest: /etc/nsswitch.conf, mode: "0644" }
+    - { template: openldap/ldap.conf.j2, dest: /usr/local/etc/openldap/ldap.conf, mode: "0644"}
 
 # Required
 - name: sigaint-soe | sssd | start services
