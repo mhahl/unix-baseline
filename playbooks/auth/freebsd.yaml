@@ -3,6 +3,12 @@
   ansible.builtin.package:
     name:
       - sssd2
+      - sssd-sudo
+      - krb5
+      - cyrus-sasl
+      - cyrus-sasl-gssapi
+      - openldap26-client
+      - pam_mkhomedir
   tags:
     - baseline:ssd
     - baseline:ssd:packages
@@ -15,6 +21,7 @@
   notify: "restart sssd"
   with_items:
     - { template: sssd/sssd.conf.j2, dest: /usr/local/etc/sssd/sssd.conf, mode: "0600" }
+    - { template: krb5/krb5.conf,j2, dest: /etc/krb5.conf, }
     - { template: pam/system, dest: /etc/pam.d/system, mode: "0644" }
     - { template: pam/sshd, dest: /etc/pam.d/sshd, mode: "0644" }
     - { template: nsswitch/nsswitch.conf, dest: /etc/nsswitch.conf, mode: "0644" }

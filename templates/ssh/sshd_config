@@ -71,7 +71,7 @@ KerberosAuthentication no
 #KerberosGetAFSToken no
 
 # GSSAPI options
-GSSAPIAuthentication no
+GSSAPIAuthentication yes
 #GSSAPICleanupCredentials yes
 
 # Set this to 'no' to disable PAM authentication, account processing,
@@ -112,9 +112,6 @@ UsePAM yes
 
 # override default of no subsystems
 Subsystem	sftp	/usr/libexec/sftp-server
-
-# Only allow people in this group to ssh to the server.
-AllowGroups grp-sigaint-ssh-users
 
 # Example of overriding settings on a per-user basis
 #Match User anoncvs

@@ -1,46 +1,39 @@
+[domain/sigaint.au]
+id_provider = ipa
+dns_discovery_domain = sigaint.au
+ipa_server = _srv_, ipa-2.syd.sigaint.au
+ipa_domain = sigaint.au
+ipa_hostname = {{ansible_fqdn}}
+auth_provider = ipa
+chpass_provider = ipa
+access_provider = ipa
+cache_credentials = True
+ldap_tls_cacert = /etc/ssl/certs/freeipa-ca.crt
+krb5_store_password_if_offline = True
+pam_gssapi_services      = sudo, sudo-i
+
 [sssd]
-config_file_version = 2
-services = nss, pam, sudo
-domains = LDAP
+services = pam, ssh, sudo, ifp, pac, nss
+domains = sigaint.au
 
 [nss]
+
 homedir_substring = /home
-
-[nss]
-default_shell = {{sssd_default_shell}}
 {% if sssd_override_shell %}
 override_shell = {{sssd_override_shell}}
 {% endif %}
 
 [pam]
+# We disable this on FreeBSD else authentication
+# will hang for a while.
+pam_passkey_auth = false
 
-[domain/LDAP]
-id_provider = ldap
-sudo_provider = ldap
-auth_provider = ldap
-autofs_provider = ldap
-auth_provider = ldap
-chpass_provider = ldap
+[autofs]
 
-# ldap_schema can be set to "rfc2307", which stores group member names in the
-# "memberuid" attribute, or to "rfc2307bis", which stores group member DNs in
-# the "member" attribute. If you do not know this value, ask your LDAP
-# administrator.
-ldap_schema = rfc2307
-ldap_uri = ldaps://ipa-1.syd.sigaint.au, ldaps://ipa-2.syd.sigaint.au, ldaps://ipa-3.syd.sigaint.au
+[ssh]
 
-ldap_search_base = dc=sigaint,dc=au
-ldap_id_use_start_tls = true
-ldap_tls_reqcert = allow
-ldap_sudo_search_base = ou=SUDOers,dc=sigaint,dc=au
+[pac]
 
-ldap_default_bind_dn = {{ldap_default_bind_dn}}
-ldap_default_authtok = {{ldap_default_authtok}}
+[ifp]
 
-# Note that enabling enumeration will have a moderate performance impact.
-# Consequently, the default value for enumeration is FALSE.
-# Refer to the sssd.conf man page for full details.
-enumerate = true
-
-# Allow offline logins by locally storing password hashes (default: false).
-cache_credentials = true
+[session_recording]

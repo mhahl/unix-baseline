@@ -3,24 +3,20 @@
 # System-wide defaults
 #
 
-# auth
-#auth		sufficient	pam_krb5.so		no_warn try_first_pass
-#auth		sufficient	pam_ssh.so		no_warn try_first_pass
-auth        sufficient  /usr/local/lib/pam_sss.so
-auth		required	pam_unix.so		no_warn try_first_pass nullok
+# AUTH
+  auth      sufficient  pam_krb5.so                      no_warn try_first_pass
+  auth      sufficient  /usr/local/lib/pam_sss.so        no_warn use_first_pass
+  auth      required    pam_unix.so                      no_warn try_first_pass nullok
 
-# account
-#account	required	pam_krb5.so
-account		required	pam_login_access.so
-account		required	pam_unix.so
+# ACCOUNT
+  account   required    pam_login_access.so
+  account   required    /usr/local/lib/pam_sss.so        ignore_unknown_user ignore_authinfo_unavail
+  account   required    pam_unix.so
 
-# session
-#session	optional	pam_ssh.so		want_agent
-session		required	pam_lastlog.so		no_fail
-session     required    pam_xdg.so
-session     required    pam_mkhomedir.so        umask=0077
+# SESSION
+  session   required    pam_lastlog.so                   no_fail
+  session   required    /usr/local/lib/pam_mkhomedir.so  mode=0700
 
-# password
-#password	sufficient	pam_krb5.so		no_warn try_first_pass
-password	required	pam_unix.so		no_warn try_first_pass
-
+# PASSWORD
+  password  sufficient  /usr/local/lib/pam_sss.so        no_warn use_authtok
+  password  required    pam_unix.so                      no_warn try_first_pass

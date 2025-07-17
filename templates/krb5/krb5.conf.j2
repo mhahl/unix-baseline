@@ -1,0 +1,23 @@
+[libdefaults]
+  default_realm = SIGAINT.AU
+  dns_lookup_realm = true
+  rdns = false
+  dns_canonicalize_hostname = false
+  dns_lookup_kdc = true
+  ticket_lifetime = 24h
+  forwardable = true
+  udp_preference_limit = 0
+  default_ccache_name = KEYRING:persistent:%{uid}
+  default_keytab_name  = FILE:/etc/krb5.keytab
+
+[realms]
+  SIGAINT.AU = {
+    pkinit_anchors = FILE:/etc/ssl/certs/freeipa-ca.crt
+  }
+
+[domain_realm]
+  .sigaint.au = SIGAINT.AU
+  sigaint.au = SIGAINT.AU
+  {{ansible_fqdn}}}} = SIGAINT.AU
+  .sigiant.au = SIGAINT.AU
+  sigiant.au = SIGAINT.AU
