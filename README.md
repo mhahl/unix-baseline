@@ -1,7 +1,11 @@
 # Baseline
-You know you want to run it, so why not just do it?
+
+Configure Sigaint SOE for FreeBSD and Linux (Red Hat Enterprise Linux)
+
 ```
-curl https://git.sr.ht/~mhahl/sigaint-sigaint-soe/blob/master/bootstrap.sh | bash -s
+git clone https://github.com/mhahl/freebsd-baseline.git 
+cd freebsd-baseline
+bash bootstrap.sh
 ```
 
 ## Installation
@@ -26,3 +30,5 @@ You can update the `/usr/local/etc/baseline.yaml` with the following toggles, th
 * `configure_sshd` - Configure the system to allow access only from (TODO: mhahl) `hbac_allow_groups`
 * `configure_sudo` - Configure the system to allow access only from (TODO: mhahl) `hbac_sudo_commands`
 * `configure_baseline` - Deploy a cronjob and ansible-pull to keep the system configured.
+
+More options are available by looking at `baseline.yaml`

@@ -20,7 +20,7 @@ echo "$password" > /var/db/baseline/.credentials
 chmod 0600 /var/db/baseline/.credentials
 
 if [ "$platform" = 'linux' ]; then
-  dnf install -y ansible
+  dnf install -y ansible-core
 
 elif [ "$platform" = 'freebsd' ]; then
   pkg install py311-ansible py311-ansible-core

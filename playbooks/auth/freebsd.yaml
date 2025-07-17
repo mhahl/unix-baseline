@@ -26,6 +26,7 @@
     - { template: pam/sshd, dest: /etc/pam.d/sshd, mode: "0644" }
     - { template: nsswitch/nsswitch.conf, dest: /etc/nsswitch.conf, mode: "0644" }
 
+# Required
 - name: sigaint-soe | sssd | start services
   ansible.builtin.service:
     name: "sssd"
