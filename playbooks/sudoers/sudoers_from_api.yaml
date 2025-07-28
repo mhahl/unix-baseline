@@ -14,6 +14,6 @@
     content: "{{request.content}}"
     dest: "{{sudoers_path}}"
     mode: '0644'
-    tags:
-      - baseline:sudoers
-      - baseline:sudoers:configure
+  tags:
+    - baseline:sudoers
+    - baseline:sudoers:configure
