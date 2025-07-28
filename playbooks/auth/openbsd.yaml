@@ -25,7 +25,7 @@
 # Add default domain
 - name: unix-baseline | write nis domain
   ansible.builtin.copy:
-    content: "sigaint.au"
+    content: "sigaint.au\n"
     dest: /etc/defaultdomain
     mode: '0644'
   notify:
