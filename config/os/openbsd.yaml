@@ -6,6 +6,4 @@
 ansible_pull_bin: /usr/local/bin/ansible-pull
 sudoers_path: /etc/sudoers
 
-ca_cert_path: /etc/ssl/cert.pem
-
 baseline_os: "openbsd"
