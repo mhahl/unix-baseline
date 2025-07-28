@@ -6,6 +6,8 @@ if [ "$unamestr" = 'Linux' ]; then
    platform='linux'
 elif [ "$unamestr" = 'FreeBSD' ]; then
    platform='freebsd'
+elif [ "$unamestr" = 'OpenBSD' ]; then
+   platform='openbsd'
 fi
 
 echo -n "Vault Password: "
@@ -21,12 +23,16 @@ chmod 0600 /var/db/baseline/.credentials
 
 if [ "$platform" = 'linux' ]; then
   dnf install -y ansible-core
-
 elif [ "$platform" = 'freebsd' ]; then
   pkg install py311-ansible py311-ansible-core
+elif [ "$platform" = 'openbsd' ]; then
+  pkg_add ansible git wget
+elif [ "$platform" = 'unknown' ]; then
+  echo "Who, are you?"
+  exit 1
 fi
 
 echo "Applying baseline"
-ansible-pull -U https://github.com/mhahl/freebsd-baseline baseline.yaml --clean --vault-pass-file /var/db/baseline/.credentials
+ansible-pull -U https://github.com/mhahl/unix-baseline baseline.yaml --clean --vault-pass-file /var/db/baseline/.credentials
 
 

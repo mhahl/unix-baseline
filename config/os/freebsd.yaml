@@ -6,4 +6,6 @@ sssd_override_shell: /usr/local/bin/bash
 ansible_pull_bin: /usr/local/bin/ansible-pull
 sudoers_path: /usr/local/etc/sudoers
 
+ca_cert_path: /etc/ssl/certs/freeipa-ca.crt
+
 baseline_os: "freebsd"

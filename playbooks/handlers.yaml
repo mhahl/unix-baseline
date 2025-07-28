@@ -32,6 +32,21 @@
     name: rsyslog
     state: restarted
 
+- name: restart ypldap
+  ansible.builtin.service:
+    name: ypldap
+    state: restarted
+
+- name: restart ypbind
+  ansible.builtin.service:
+    name: ypbind
+    state: restarted
+
+- name: restart portmap
+  ansible.builtin.service:
+    name: portmap
+    state: restarted
+
 - name: update-ca-trust
   ansible.builtin.command:
     cmd: /usr/bin/update-ca-trust
@@ -39,3 +54,11 @@
 - name: augenrules
   ansible.builtin.command:
     cmd: /sbin/augenrules --load
+
+- name: run update login.conf
+  ansible.builtin.command:
+    cmd: cap_mkdb /etc/login.conf
+
+- name: run update master.passwd
+  ansible.builtin.command:
+    cmd: pwd_mkdb -p /etc/master.passwd

@@ -1,6 +1,7 @@
 ---
 # http://127.0.0.1:3000/api/v1/machines/check_in"
 moonlight_api: "https://moonlight.ts.sigaint.au/api/v1/machines/check_in"
+sigaint_api: "https://api.sigaint.au/api/v1"
 
 # Only these distributions are supported
 sigaint_soe_supported_distributions:

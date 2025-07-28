@@ -1,7 +1,7 @@
 ---
 - name: sigaint-soe | cacert | get file stats
   ansible.builtin.stat:
-    path: /etc/ssl/certs/freeipa-ca.crt
+    path: "{{ca_cert_path}}"
   register: cert
   tags:
     - baseline:cacert
@@ -10,10 +10,21 @@
 - name: sigaint-soe | cacert | deploy cacert
   ansible.builtin.get_url:
     url: https://ipa-1.syd.sigaint.au/ipa/config/ca.crt
-    dest: /etc/ssl/certs/freeipa-ca.crt
+    dest: "{{ca_cert_path}}"
     validate_certs: false
     mode: '0644'
   when: not cert.stat.exists
+  tags:
+    - baseline:cacert
+    - baseline:cacert:configure
+
+- name: unix-baseline | run update-ca-trust
+  debug:
+    msg: "run update-ca-trust on linux"
+  notify: "update-ca-trust"
+  when:
+    - baseline_os in ["linux"]
+    - not cert.stat.exists
   tags:
     - baseline:cacert
     - baseline:cacert:configure
