@@ -14,6 +14,6 @@
     content: "{{request.content}}"
     dest: /etc/netgroup
     mode: '0644'
-    tags:
-      - baseline:netgroups
-      - baseline:netgroups:configure
+  tags:
+    - baseline:netgroups
+    - baseline:netgroups:configure
