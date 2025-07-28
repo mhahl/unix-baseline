@@ -3,6 +3,4 @@ host=ldaps://ipa-2.syd.sigaint.au
 host=ldaps://ipa-3.syd.sigaint.au
 cacert={{ca_cert_path}}
 timeout=15
-basedn=dc=sigaint,dc=au
-binddn={{ldap_default_bind_dn}}
-bindpw={{ldap_default_authtok}}
+binddn=uid=%u,cn=users,cn=accounts,dc=sigaint,dc=au
