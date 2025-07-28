@@ -2,7 +2,7 @@
 - name: unix-baseline | auth | install packages
   ansible.builtin.package:
     name:
-      - sudo-1.9.17.1p0-gettext-ldapkrb
+      - sudo-1.9.17.1p0-gettext-ldap
   tags:
     - baseline:sudoers
     - baseline:sudoers:packages
