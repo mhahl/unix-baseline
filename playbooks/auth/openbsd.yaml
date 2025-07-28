@@ -22,7 +22,7 @@
     - { template: openbsd/login.conf.j2, dest: /etc/login.conf, mode: "0644" }
     - { template: openbsd/ypldap.conf.j2, dest: /etc/ypldap.conf, mode: "0644" }
 
-
+# Add default domain
 - name: unix-baseline | write nis domain
   ansible.builtin.copy:
     content: "sigaint.au"
