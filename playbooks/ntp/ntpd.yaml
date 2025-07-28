@@ -9,7 +9,7 @@
     - baseline:ntp
     - baseline:ntp:configure
   with_items:
-    - { template: ntp/ntp.conf.j2, dest: /etc/ntp.conf, mode: "0644" }
+    - { template: "ntp/{{baseline_os}}/ntp.conf.j2", dest: /etc/ntp.conf, mode: "0644" }
 
 - name: sigaint-soe | ntp | start services
   ansible.builtin.service:
