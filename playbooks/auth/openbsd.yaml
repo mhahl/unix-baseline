@@ -3,7 +3,7 @@
   ansible.builtin.package:
     name:
       - wget
-      - openldap-client
+      - openldap-client-2.6.9p0v0-gssapi
   tags:
     - baseline:yp
     - baseline:yp:packages
