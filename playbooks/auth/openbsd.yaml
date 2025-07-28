@@ -13,6 +13,8 @@
     src: "../templates/{{ item.template }}"
     dest: "{{ item.dest }}"
     mode: "{{ item.mode }}"
+    owner: "{{item.owner | default(omit)}}"
+    group: "{{item.group | default(omit)}}"
   notify:
     - "restart sshd"
     - "run update login.conf"
