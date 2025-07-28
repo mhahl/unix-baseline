@@ -8,7 +8,7 @@
     - baseline:syslog
     - baseline:syslog:configure
   with_items:
-    - { template: "syslog/freebsd/syslog.conf.j2", dest: /etc/syslog.conf, mode: "0644" }
+    - { template: "syslog/openbsd/syslog.conf.j2", dest: /etc/syslog.conf, mode: "0644" }
 
 - name: sigaint-soe | rsyslog | add syslog args
   ansible.builtin.lineinfile:
