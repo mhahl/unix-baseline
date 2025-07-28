@@ -1,0 +1,9 @@
+#       $OpenBSD: crontab,v 1.28 2020/04/18 17:22:43 jmc Exp $
+#
+# /var/cron/tabs/baseline
+#
+SHELL=/bin/sh
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
+HOME=/var/log
+
+*/30 * * * * root {{ansible_pull_bin}} -U https://github.com/mhahl/unix-baseline baseline.yaml --clean --vault-pass-file /var/db/baseline/.credentials >/dev/null 2>&1
