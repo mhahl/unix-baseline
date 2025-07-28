@@ -14,7 +14,7 @@
   ansible.builtin.lineinfile:
     path: /etc/rc.conf
     regexp: '^syslogd_flags='
-    line: 'syslogd_flags="-O syslog -v -v"'
+    line: 'syslogd_flags="-4 -h"'
   tags:
     - baseline:syslog
     - baseline:syslog:configure
