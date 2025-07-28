@@ -20,6 +20,7 @@
   with_items:
     - { template: openldap/ldap.conf.j2, dest: /etc/ldap.conf, mode: "0600" }
     - { template: openbsd/login.conf.j2, dest: /etc/login.conf, mode: "0644" }
+    - { template: openbsd/login_ldap.conf.j2, dest: /etc/login_ldap.conf, mode: "0640" }
     - { template: openbsd/ypldap.conf.j2, dest: /etc/ypldap.conf, mode: "0600" }
 
 # Add default domain
