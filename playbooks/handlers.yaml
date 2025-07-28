@@ -65,3 +65,7 @@
 - name: run update master.passwd
   ansible.builtin.command:
     cmd: pwd_mkdb -p /etc/master.passwd
+
+- name: run update /etc/netgroup
+  ansible.builtin.command:
+    cmd: netgroup_mkdb /etc/netgroup
