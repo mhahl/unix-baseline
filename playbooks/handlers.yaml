@@ -36,16 +36,19 @@
   ansible.builtin.service:
     name: ypldap
     state: restarted
+    enabled: true
 
 - name: restart ypbind
   ansible.builtin.service:
     name: ypbind
     state: restarted
+    enabled: true
 
 - name: restart portmap
   ansible.builtin.service:
     name: portmap
     state: restarted
+    enabled: true
 
 - name: update-ca-trust
   ansible.builtin.command:

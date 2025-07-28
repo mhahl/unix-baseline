@@ -8,7 +8,7 @@ TLS_CACERT  /etc/ssl/certs/freeipa-ca.crt
 
 {% if baseline_os == "openbsd" %}
 host=ldaps://ipa-1.syd.sigaint.au
-cacert=/etc/ssl/cert.pem
+cacert={{ca_cert_path}}
 scope=sub
 basedn=dc=sigaint,dc=au
 binddn={{ldap_default_bind_dn}}
