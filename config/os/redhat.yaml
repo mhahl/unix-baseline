@@ -4,3 +4,5 @@ ansible_pull_bin: /usr/bin/ansible-pull
 sudoers_path: /etc/sudoers
 
 baseline_os: "linux"
+
+ca_cert_path: /etc/pki/ca-trust/source/anchors/ca.crt

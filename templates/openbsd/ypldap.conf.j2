@@ -1,0 +1,44 @@
+# $OpenBSD: ypldap.conf,v 1.1 2014/07/11 21:20:10 deraadt Exp $
+
+domain          "sigaint.au"
+interval        60
+provide map     "passwd.byname"
+provide map     "passwd.byuid"
+provide map     "group.byname"
+provide map     "group.bygid"
+provide map     "netid.byname"
+
+cafile "{{ca_cert_path}}"
+
+directory "ipa-1.syd.sigaint.au" ldaps {
+        # directory options
+        binddn "{{ldap_default_bind_dn}}"
+        bindcred "{{ldap_default_authtok}}"
+        basedn "dc=sigaint,dc=au"
+        # starting point for groups directory search, default to basedn
+        #groupdn "cn=groups,cn=accounts,dc=sigaint,dc=au"
+
+        # passwd maps configuration (RFC 2307 posixAccount object class)
+        passwd filter "(objectClass=posixAccount)"
+
+        attribute name maps to "uid"
+        fixed attribute passwd "*"
+        attribute uid maps to "uidNumber"
+        attribute gid maps to "gidNumber"
+        attribute gecos maps to "cn"
+        attribute home maps to "homeDirectory"
+        attribute shell maps to "loginShell"
+        fixed attribute shell "/bin/ksh"
+        fixed attribute change "0"
+        fixed attribute expire "0"
+        fixed attribute class ""
+
+        # group maps configuration (RFC 2307 posixGroup object class)
+        group filter "(objectClass=posixGroup)"
+
+        attribute groupname maps to "cn"
+        fixed attribute grouppasswd "*"
+        attribute groupgid maps to "gidNumber"
+        # memberUid returns multiple group members
+        list groupmembers maps to "memberUid"
+}

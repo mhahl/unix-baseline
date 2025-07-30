@@ -1,0 +1,20 @@
+---
+- name: system-baseline | fetch netgroups from api
+  tags:
+    - baseline:netgroups
+    - baseline:netgroups:configure
+  ansible.builtin.uri:
+    url: "{{sigaint_api}}/netgroups"
+    method: GET
+    return_content: true
+  register: request
+
+- name: system-baseline | write netgroups to file
+  ansible.builtin.copy:
+    content: "{{request.content}}"
+    dest: /etc/netgroup
+    mode: '0644'
+  notify: "run update /etc/netgroup"
+  tags:
+    - baseline:netgroups
+    - baseline:netgroups:configure

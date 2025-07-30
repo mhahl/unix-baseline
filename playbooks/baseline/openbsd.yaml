@@ -1,0 +1,9 @@
+- name: unix-baseline | baseline | add baseline to root crontab
+  ansible.builtin.lineinfile:
+    path: /etc/rc.conf
+    regexp: 'baseline.yaml'
+    insertafter: EOF
+    line: "*/30 * * * * root {{ansible_pull_bin}} -U https://github.com/mhahl/unix-baseline baseline.yaml --clean --vault-pass-file /var/db/baseline/.credentials >/dev/null 2>&1"
+  tags:
+    - baseline
+    - baseline:configure

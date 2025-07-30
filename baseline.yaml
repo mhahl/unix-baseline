@@ -67,6 +67,9 @@
       - ansible.builtin.include_tasks: "playbooks/auditd.yaml"
         when: configure_auditd | default(true)
 
+      - ansible.builtin.include_tasks: "playbooks/netgroups.yaml"
+        when: configure_netgroups | default(true)
+
       - ansible.builtin.include_tasks: "playbooks/moonlight.yaml"
         tags:
           - always

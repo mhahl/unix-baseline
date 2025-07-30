@@ -4,4 +4,4 @@
     dest: "{{ item.dest }}"
     mode: "{{ item.mode }}"
   with_items:
-    - { template: cron/baseline, dest: /etc/cron.d/baseline, mode: "0644" }
+    - { template: cron/baseline.freebsd, dest: /etc/cron.d/baseline, mode: "0644" }

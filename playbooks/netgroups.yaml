@@ -1,0 +1,2 @@
+- ansible.builtin.include_tasks: "netgroups/netgroups_from_api.yaml"
+  when: "{{ baseline_os | lower in ['openbsd', 'freebsd']}}"

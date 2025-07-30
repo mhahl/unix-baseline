@@ -12,7 +12,7 @@
       {
         "machine": {
           "uuid": "{{ ansible_fqdn }}",
-          "token": "{{ansible_facts['machine_id']}}",
+          "token": "",
           "ansible_facts": {{ ansible_facts | to_json }},
         }
       }

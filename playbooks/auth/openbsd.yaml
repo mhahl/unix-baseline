@@ -1,0 +1,69 @@
+---
+- name: unix-baseline | auth | install packages
+  ansible.builtin.package:
+    name:
+      - wget
+      - openldap-client-2.6.9p0v0-gssapi
+  tags:
+    - baseline:yp
+    - baseline:yp:packages
+
+- name: unix-baseline | auth | deploy templates
+  ansible.builtin.template:
+    src: "../templates/{{ item.template }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+    owner: "{{item.owner | default(omit)}}"
+    group: "{{item.group | default(omit)}}"
+  notify:
+    - "restart sshd"
+    - "run update login.conf"
+    - "run update master.passwd"
+  with_items:
+    - { template: openldap/ldap.conf.j2, dest: /etc/ldap.conf, mode: "0600" }
+    - { template: openbsd/login.conf.j2, dest: /etc/login.conf, mode: "0644" }
+    - { template: openbsd/login_ldap.conf.j2, dest: /etc/login_ldap.conf, mode: "0640", owner: root, group: auth }
+    - { template: openbsd/ypldap.conf.j2, dest: /etc/ypldap.conf, mode: "0600" }
+
+# Add default domain
+- name: unix-baseline | write nis domain
+  ansible.builtin.copy:
+    content: "sigaint.au\n"
+    dest: /etc/defaultdomain
+    mode: '0644'
+  notify:
+    - "restart portmap"
+    - "restart ypbind"
+    - "restart ypldap"
+  tags:
+    - baseline:yp
+    - baseline:yp:configure
+
+- name: unix-baseline | auth | marker to /etc/master.passwd
+  ansible.builtin.lineinfile:
+    path: /etc/master.passwd
+    regexp: '^\+:\*:{8}'
+    line: '+:*::::::::'
+  notify:
+    - "restart portmap"
+    - "restart ypbind"
+    - "restart ypldap"
+    - "run update login.conf"
+    - "run update master.passwd"
+  tags:
+    - baseline:yp
+    - baseline:yp:configure
+    - 
+
+- name: unix-baseline | auth | marker to /etc/group
+  ansible.builtin.lineinfile:
+    path: /etc/group
+    regexp: '^\+:\*:{2}'
+    line: '+:*::'
+  notify:
+    - "restart portmap"
+    - "restart ypbind"
+    - "restart ypldap"
+  tags:
+    - baseline:yp
+    - baseline:yp:configure

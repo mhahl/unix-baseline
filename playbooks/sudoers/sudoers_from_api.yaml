@@ -1,0 +1,27 @@
+---
+- name: unix-baseline | auth | install packages
+  ansible.builtin.package:
+    name:
+      - sudo-1.9.17.1p0-gettext-ldap
+  tags:
+    - baseline:sudoers
+    - baseline:sudoers:packages
+
+- name: unix-baseline | fetch sudoers from api
+  tags:
+    - baseline:sudoers
+    - baseline:sudoers:configure
+  ansible.builtin.uri:
+    url: "{{sigaint_api}}/sudoers"
+    method: GET
+    return_content: true
+  register: request
+
+- name: unix-baseline | write sudoers to file
+  ansible.builtin.copy:
+    content: "{{request.content}}"
+    dest: "{{sudoers_path}}"
+    mode: '0644'
+  tags:
+    - baseline:sudoers
+    - baseline:sudoers:configure
