@@ -2,6 +2,9 @@
 #
 # /var/cron/tabs/baseline
 #
+# This file isn't deployed.
+#
+
 SHELL=/bin/sh
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 HOME=/var/log
