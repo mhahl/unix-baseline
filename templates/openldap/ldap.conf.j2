@@ -1,13 +1,13 @@
 {% if baseline_os == "freebsd" %}
 BASE        dc=sigaint,dc=au
-URI         ldaps://ipa-1.syd.sigaint.au ldaps://ipa-2.syd.sigaint.au ldaps://ipa-3.syd.sigaint.au
+URI         ldaps://idm-46c2.syd.sigaint.au ldaps://ipa-2.syd.sigaint.au ldaps://ipa-3.syd.sigaint.au
 SASL_MECH   GSSAPI
 SASL_REALM  SIGAINT.AU
 TLS_CACERT  /etc/ssl/certs/freeipa-ca.crt
 {% endif %}
 
 {% if baseline_os == "openbsd" %}
-host=ldaps://ipa-1.syd.sigaint.au
+host=ldaps://idm-46c2.syd.sigaint.au
 cacert={{ca_cert_path}}
 scope=sub
 basedn=dc=sigaint,dc=au

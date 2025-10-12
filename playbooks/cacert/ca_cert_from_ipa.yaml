@@ -9,7 +9,7 @@
 
 - name: sigaint-soe | cacert | deploy cacert
   ansible.builtin.get_url:
-    url: https://ipa-1.syd.sigaint.au/ipa/config/ca.crt
+    url: https://idm-46c2.syd.sigaint.au/ipa/config/ca.crt
     dest: "{{ca_cert_path}}"
     validate_certs: false
     mode: '0644'
