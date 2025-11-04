@@ -1,0 +1,3 @@
+---
+- ansible.builtin.include_tasks: "fleet/linux.yaml"
+  when: "{{ baseline_os | lower in ['linux']}}"

@@ -70,6 +70,9 @@
       - ansible.builtin.include_tasks: "playbooks/netgroups.yaml"
         when: configure_netgroups | default(true)
 
+      - ansible.builtin.include_tasks: "playbooks/fleet.yaml"
+        when: configure_fleet| default(true)
+
       - ansible.builtin.include_tasks: "playbooks/moonlight.yaml"
         tags:
           - always

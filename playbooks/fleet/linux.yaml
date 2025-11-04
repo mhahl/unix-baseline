@@ -1,0 +1,8 @@
+---
+- name: sigaint-soe | fleet | deploy fleet rpms
+  ansible.builtin.dnf:
+    name: "{{fleet_rpm_url}}"
+    state: present
+  tags:
+    - baseline:fleet
+    - baseline:fleet:configure

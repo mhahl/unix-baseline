@@ -3,6 +3,9 @@
 moonlight_api: "https://moonlight.ts.sigaint.au/api/v1/machines/check_in"
 sigaint_api: "https://api.sigaint.au/api/v1"
 
+# Fleet configuration
+fleet_rpm_url:  https://s3.sigaint.au/sigaint-assets-dad19e2f-171a-4d19-86c0-37a92e320b73/fleet-osquery-1.49.1-server.x86_64.rpm
+
 # Only these distributions are supported
 sigaint_soe_supported_distributions:
   - FreeBSD
