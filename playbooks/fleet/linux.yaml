@@ -3,6 +3,7 @@
   ansible.builtin.dnf:
     name: "{{fleet_rpm_url}}"
     state: present
+    disable_gpg_check: true
   tags:
     - baseline:fleet
     - baseline:fleet:configure
