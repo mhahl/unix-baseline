@@ -1,78 +1,56 @@
 ---
-- hosts: localhost
-  vars_files:
+- name: Baseline system configuration
+  hosts: localhost
+  connection: local
   handlers:
-    - import_tasks: "playbooks/handlers.yaml"
+    - import_tasks: playbooks/handlers.yaml
+
   tasks:
-    # Include host vars if they exist!
-    - include_vars:
-        file: "{{item}}"
+    # ------------------------------------------------------------------
+    # Always-run tasks: load variables and assert supported OS
+    # ------------------------------------------------------------------
+    - name: Load variable files (ignore missing files)
+      ansible.builtin.include_vars:
+        file: "{{ item }}"
       loop:
-        - "config/defaults.yaml"
-        - "/usr/local/etc/baseline/config.yaml"
-        - "config/os/{{ansible_distribution | lower}}.yaml"
-        - "config/secrets.yaml"
-      failed_when: false
-      tags:
-        - always
-    # Always check if we are on a supported OS
-    - ansible.builtin.assert:
-        that:
-          - baseline_os
-        fail_msg: "{{baseline_os}} not supported."
-        success_msg: "{{baseline_os}} supported."
-      tags:
-        - always
+        - config/defaults.yaml
+        - /usr/local/etc/baseline/config.yaml
+        - config/os/{{ ansible_distribution | lower }}.yaml
+        - config/secrets.yaml
+      ignore_errors: true
+      tags: always
 
-    - block:
-      - ansible.builtin.include_tasks: "playbooks/cacert.yaml"
-        when: configure_cacert | default(true)
+    - name: Assert that the operating system is supported
+      ansible.builtin.assert:
+        that: baseline_os is defined
+        success_msg: "{{ baseline_os }} is supported."
+        fail_msg: "{{ baseline_os }} is not supported."
+      tags: always
 
-      - ansible.builtin.include_tasks: "playbooks/repos.yaml"
-        when: configure_repos | default(true)
-
-      - ansible.builtin.include_tasks: "playbooks/dns.yaml"
-        when: configure_dns | default(true)
-
-      - ansible.builtin.include_tasks: "playbooks/motd.yaml"
-        when: configure_motd | default(true)
-
-      - ansible.builtin.include_tasks: "playbooks/timezone.yaml"
-        when: configure_timezone | default(true)
-
-      - ansible.builtin.include_tasks: "playbooks/ntp.yaml"
-        when: configure_ntp | default(true)
-
-      - ansible.builtin.include_tasks: "playbooks/skel.yaml"
-        when: configure_skel | default(true)
-
-      - ansible.builtin.include_tasks: "playbooks/auth.yaml"
-        when: configure_sssd | default(true)
-
-      - ansible.builtin.include_tasks: "playbooks/sudoers.yaml"
-        when: configure_sudoers | default(true)
-
-      - ansible.builtin.include_tasks: "playbooks/sshd.yaml"
-        when: configure_sshd | default(true)
-
-      - ansible.builtin.include_tasks: "playbooks/baseline.yaml"
-        when: configure_baseline | default(true)
-
-      - ansible.builtin.include_tasks: "playbooks/syslog.yaml"
-        when: configure_syslog | default(true)
-
-      - ansible.builtin.include_tasks: "playbooks/profile.yaml"
-        when: configure_profile | default(true)
-
-      - ansible.builtin.include_tasks: "playbooks/auditd.yaml"
-        when: configure_auditd | default(true)
-
-      - ansible.builtin.include_tasks: "playbooks/netgroups.yaml"
-        when: configure_netgroups | default(true)
-
-      - ansible.builtin.include_tasks: "playbooks/fleet.yaml"
-        when: configure_fleet| default(true)
-
-      - ansible.builtin.include_tasks: "playbooks/moonlight.yaml"
-        tags:
-          - always
+    # ------------------------------------------------------------------
+    # Conditional configuration tasks
+    # ------------------------------------------------------------------
+    - name: Apply baseline configuration tasks
+      ansible.builtin.include_tasks: "playbooks/{{ item.task }}.yaml"
+      loop:
+        - { task: cacert,      var: configure_cacert,      default: true }
+        - { task: repos,       var: configure_repos,       default: true }
+        - { task: dns,         var: configure_dns,         default: true }
+        - { task: motd,        var: configure_motd,        default: true }
+        - { task: timezone,    var: configure_timezone,    default: true }
+        - { task: ntp,         var: configure_ntp,         default: true }
+        - { task: skel,        var: configure_skel,        default: true }
+        - { task: auth,        var: configure_sssd,        default: true }
+        - { task: sudoers,     var: configure_sudoers,     default: true }
+        - { task: sshd,        var: configure_sshd,        default: true }
+        - { task: baseline,    var: configure_baseline,    default: true }
+        - { task: syslog,      var: configure_syslog,      default: true }
+        - { task: profile,     var: configure_profile,     default: true }
+        - { task: auditd,      var: configure_auditd,      default: true }
+        - { task: netgroups,   var: configure_netgroups,   default: true }
+        - { task: fleet,       var: configure_fleet,       default: true }
+        - { task: moonlight,   var: true,                  default: true }  # always run
+      when: item.var | default(item.default) | bool
+      tags: "{{ item.task }}"   # optional: gives each task its own tag
+      loop_control:
+        label: "{{ item.task }}"
