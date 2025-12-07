@@ -1,27 +1,26 @@
 ---
-
-- name: sigaint-soe | timezone | get file stats
-  ansible.builtin.stat:
-    path: /etc/localtime
-  register: sym
+- name: Configure system timezone
   tags:
     - baseline:timezone
     - baseline:timezone:configure
 
-- name: sigaint-soe | timezone | remove localtime if not a symlink
-  ansible.builtin.file:
-    path: "/etc/localtime"
-    state: absent
-  when: sym.stat.islnk is defined and not sym.stat.islnk
-  tags:
-    - baseline:timezone
-    - baseline:timezone:configure
+  block:
+    - name: Gather current /etc/localtime status
+      ansible.builtin.stat:
+        path: /etc/localtime
+      register: localtime_stat
 
-- name: sigaint-soe | timezone | set timezone
-  ansible.builtin.file:
-    src: "/usr/share/zoneinfo/{{ timezone }}"
-    dest: /etc/localtime
-    state: link
-  tags:
-    - baseline:timezone
-    - baseline:timezone:configure
+    - name: Remove /etc/localtime if it exists and is not a symlink
+      ansible.builtin.file:
+        path: /etc/localtime
+        state: absent
+      when: >
+        localtime_stat.stat.exists and
+        (localtime_stat.stat.islnk is not defined or not localtime_stat.stat.islnk)
+
+    - name: Ensure /etc/localtime is a correct symlink to the desired timezone
+      ansible.builtin.file:
+        src: "/usr/share/zoneinfo/{{ timezone }}"
+        dest: /etc/localtime
+        state: link
+        force: yes

@@ -1,3 +1,7 @@
 ---
-- ansible.builtin.include_tasks: "skel/freebsd.yaml"
-  when: "{{ baseline_os | lower in ['freebsd']}}"
+- name: Configure skel (FreeBSD only)
+  ansible.builtin.include_tasks: skel/freebsd.yaml
+  when: baseline_os | lower == 'freebsd'
+  tags:
+    - baseline:skel
+    - baseline:skel:configure
