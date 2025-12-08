@@ -4,7 +4,7 @@ moonlight_api: "https://moonlight.ts.sigaint.au/api/v1/machines/check_in"
 sigaint_api: "https://api.sigaint.au/api/v1"
 
 # Fleet configuration
-fleet_rpm_url: https://f000.backblazeb2.com/file/sigaint-public/fleet-osquery-1.49.1-server.x86_64.rpm
+fleet_rpm_url: https://f000.backblazeb2.com/file/sigaint-public/fleet-osquery-1.50.1.x86_64.rpm
 
 # Supported distributions
 sigaint_soe_supported_distributions:
