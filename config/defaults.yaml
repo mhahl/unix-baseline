@@ -1,74 +1,72 @@
 ---
-# http://127.0.0.1:3000/api/v1/machines/check_in"
+# API Endpoints
 moonlight_api: "https://moonlight.ts.sigaint.au/api/v1/machines/check_in"
 sigaint_api: "https://api.sigaint.au/api/v1"
 
 # Fleet configuration
-fleet_rpm_url:  https://f000.backblazeb2.com/file/sigaint-public/fleet-osquery-1.49.1-server.x86_64.rpm
+fleet_rpm_url: https://f000.backblazeb2.com/file/sigaint-public/fleet-osquery-1.49.1-server.x86_64.rpm
 
-# Only these distributions are supported
+# Supported distributions
 sigaint_soe_supported_distributions:
   - FreeBSD
   - Fedora
   - RedHat
 
+# DNS search domains
 dns_search:
   - sigaint.au
   - ts.sigaint.au
 
-# Set system timezone
+# System settings
 timezone: "Australia/Sydney"
-
-# Set the default syslog server
 syslog_server: "syslog.v4.dmz.sigaint.au:514"
 
-# When using systemd-resolvd we set these
-# in the  /etc/systemd/resolved.conf
-# and use DNSOverTLS
-#
+# DNS servers for systemd-resolved (with DNS over TLS)
 systemd_resolved_dns:
   - "45.90.28.0#2ab561.dns.nextdns.io"
   - "2a07:a8c0::#2ab561.dns.nextdns.io"
-  - "2a07:a8c0::#2ab561.dns.nextdns.io"
+  - "2a07:a8c1::#2ab561.dns.nextdns.io"
   - "2a07:a8c1::#2ab561.dns.nextdns.io"
 
-# When using resolv.conf we use these
-# nameservers. Mostly for FreeBSD
-#
+# DNS servers for resolv.conf (mostly FreeBSD)
 resolv_conf_dns:
   - 45.90.28.189
   - 45.90.30.189
   - 2a07:a8c0::2a:b561
   - 2a07:a8c1::2a:b561
 
+# NTP servers
 ntp_servers:
   - time1.google.com
   - time2.google.com
   - time3.google.com
   - time4.google.com
 
-# Fetch the ssh keys for the users here
-# FreeBSD Only.
-#
+# User SSH authorized keys (FreeBSD only)
 user_ssh_keys:
-  - { name: "mhahl", url: https://github.com/mhahl.keys }
+  - name: "mhahl"
+    url: https://github.com/mhahl.keys
 
-# Alias workstations to the hosts that are considered workstations.
+# HBAC/Sudo configuration (FreeIPA-style)
+
+# Host aliases (e.g., WORKSTATIONS)
 hbac_sudo_hosts: []
-#  - name: WORKSTATIONS
-#    hosts:
-#      - ws0124.corp.sigaint.au
+# Example (uncomment to use):
+# - name: WORKSTATIONS
+#   hosts:
+#     - ws0124.corp.sigaint.au
 
+# Command aliases
 hbac_sudo_commands: []
-##  - name: REBOOT
-##    commands:
-##      - /sbin/reboot
-##      - /sbin/poweroff
+# Example (uncomment to use):
+# - name: REBOOT
+#   commands:
+#     - /sbin/reboot
+#     - /sbin/poweroff
 
+# Sudo run-as rules
 hbac_sudo_runas:
-  # Allow administrators to run any commands as root
-  # without a password.
-  #
+  # Administrators can run any command as root without password
   - name: "%grp-sigaint-admins"
     hosts:
       - ALL
@@ -81,10 +79,8 @@ hbac_sudo_runas:
     commands:
       - ALL
 
-  # On Workstations and Laptops allow the user to run
-  # the following commands as root without a password.
-  # These machines are mostly treated as personal machines.
-  #
+  # Users on workstations/laptops can run any command as root without password
+  # (treated as personal machines)
   - name: "%grp-sigaint-users"
     hosts:
       - WORKSTATIONS
