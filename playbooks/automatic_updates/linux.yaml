@@ -1,0 +1,35 @@
+---
+
+- name: Ensure dnf-automatic package is installed
+  ansible.builtin.dnf:
+    name: dnf-automatic
+    state: present
+
+- name: Enable only security updates (apply_updates = yes, upgrade_type = security)
+  ansible.builtin.blockinfile:
+    path: /etc/dnf/automatic.conf
+    create: yes
+    owner: root
+    group: root
+    mode: "0644"
+    block: |
+      [commands]
+      upgrade_type = security
+      apply_updates = yes
+      download_updates = yes
+      random_sleep = 900
+
+      [emitters]
+      emit_via = stdio
+
+      [base]
+      debuglevel = 1
+      gpgcheck = True
+
+
+- name: Ensure the dnf-automatic timer is enabled and started.
+  ansible.builtin.systemd:
+    name: dnf-automatic.timer
+    enabled: true
+    state: started
+    daemon_reload: true

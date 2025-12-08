@@ -1,3 +1,7 @@
 ---
-- ansible.builtin.include_tasks: "sudoers/sudoers_from_api.yaml"
-  when: "{{ baseline_os | lower in ['openbsd']}}"
+- name: Configure sudoers from API (OpenBSD only)
+  ansible.builtin.include_tasks: sudoers/sudoers_from_api.yaml
+  when: baseline_os | lower == 'openbsd'
+  tags:
+    - baseline:sudoers
+    - baseline:sudoers:configure

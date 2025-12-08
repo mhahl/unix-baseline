@@ -1,3 +1,60 @@
 ---
-- ansible.builtin.include_tasks: "auditd/linux.yaml"
-  when: "{{ baseline_os | lower in ['linux']}}"
+- name: Install auditd packages (Linux only)
+  ansible.builtin.package:
+    name:
+      - audispd-plugins
+      - audit  # recommended to ensure the base package is present
+  notify: restart auditd
+  when: baseline_os | lower == 'linux'
+  tags:
+    - baseline:auditd
+    - baseline:auditd:packages
+
+- name: Configure auditd
+  when: baseline_os | lower == 'linux'
+  tags:
+    - baseline:auditd
+    - baseline:auditd:configure
+
+  block:
+    - name: Configure audispd syslog plugin
+      ansible.builtin.template:
+        src: templates/auditd/plugins.d/syslog.conf.j2
+        dest: /etc/audit/plugins.d/syslog.conf
+        owner: root
+        group: root
+        mode: "0640"
+      notify: reload audit rules
+      tags:
+        - baseline:auditd:plugins
+
+    - name: Deploy audit rules
+      ansible.builtin.template:
+        src: templates/auditd/rules.d/{{ item }}
+        dest: /etc/audit/rules.d/{{ item }}
+        owner: root
+        group: root
+        mode: "0640"
+      loop:
+        - 10-base-config.rules
+        - 30-actions.rules
+        - 31-audit_rules_usergroup_modification.rules
+        - 32-activity.rules
+        - 33-access.rules
+        - 34-delete.rules
+        - 35-logins.rules
+        - 36-session.rules
+        - 70-system_local.rules
+        - 71-MAC_policy.rules
+        - 72-maintenance.rules
+        - 73-modules.rules
+        - 73-mounts.rules
+        - 74-perm_mod.rules
+        - 75-privileged.rules
+        - 76-setgid.rules
+        - 77-setuid.rules
+        - 78-time_change.rules
+        - 99-finalize.rules
+      notify: reload audit rules
+      tags:
+        - baseline:auditd:rules

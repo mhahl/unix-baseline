@@ -1,3 +1,7 @@
 ---
-- ansible.builtin.include_tasks: "fleet/linux.yaml"
-  when: "{{ baseline_os | lower in ['linux']}}"
+- name: Configure fleet/osquery enrollment (Linux only)
+  ansible.builtin.include_tasks: fleet/linux.yaml
+  when: baseline_os | lower == 'linux'
+  tags:
+    - baseline:fleet
+    - baseline:fleet:configure

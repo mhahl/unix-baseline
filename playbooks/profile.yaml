@@ -1,3 +1,7 @@
----
-- ansible.builtin.include_tasks: "profile/linux.yaml"
-  when: "{{ baseline_os | lower in ['linux']}}"
+- name: Configure shell profile customizations
+  ansible.builtin.include_tasks: >-
+    profile/{{ baseline_os | lower }}.yaml
+  when: baseline_os | lower in ['linux']  # add as needed
+  tags:
+    - baseline:profile
+    - baseline:profile:configure

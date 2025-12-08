@@ -1,0 +1,7 @@
+- name: Configure automatic updates
+  ansible.builtin.include_tasks: >-
+    automatic_updates/{{ baseline_os | lower }}.yaml
+  when: baseline_os | lower in ['linux']
+  tags:
+    - baseline:automatic_updates
+    - baseline:automatic_updates:configure

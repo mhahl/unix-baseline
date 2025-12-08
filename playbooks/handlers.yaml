@@ -1,71 +1,87 @@
-- name: restart sssd
+---
+- name: Restart SSSD
   ansible.builtin.service:
     name: sssd
     state: restarted
+  when: baseline_os | lower == 'linux'
+  listen: "restart sssd"
 
-- name: restart ntpd
+- name: Restart time synchronization service
   ansible.builtin.service:
-    name: ntpd
+    name: "{{ 'ntpd' if baseline_os | lower == 'freebsd' else 'chronyd' }}"
     state: restarted
+  when: baseline_os | lower in ['freebsd', 'linux']
+  listen: "restart ntp"
 
-- name: restart chronyd
+- name: Restart SSH daemon
   ansible.builtin.service:
-    name: chronyd
+    name: sshd
     state: restarted
+  listen: "restart sshd"
 
-- name: restart sshd
+- name: Restart syslog service
   ansible.builtin.service:
-    name: ntpd
+    name: "{{ 'syslogd' if baseline_os | lower in ['freebsd', 'openbsd'] else 'rsyslog' }}"
     state: restarted
+  when: baseline_os | lower in ['freebsd', 'openbsd', 'linux']
+  listen: "restart syslog"
 
-- name: restart syslog
-  ansible.builtin.service:
-    name: syslogd
-    state: restarted
-
-- name: restart auditd
+- name: Reload audit rules (auditd)
   ansible.builtin.command:
-    cmd: "/sbin/auditctl -R /etc/audit/audit.rules"
+    cmd: /sbin/auditctl -R /etc/audit/audit.rules
+  when: baseline_os | lower == 'linux'
+  listen: "reload auditd"
 
-- name: restart rsyslog
-  ansible.builtin.service:
-    name: rsyslog
-    state: restarted
+- name: Load new audit rules (augenrules)
+  ansible.builtin.command:
+    cmd: /sbin/augenrules --load
+  when: baseline_os | lower == 'linux'
+  listen: "reload audit rules"
 
-- name: restart ypldap
+- name: Restart ypldap
   ansible.builtin.service:
     name: ypldap
     state: restarted
     enabled: true
+  when: baseline_os | lower in ['freebsd', 'openbsd']
+  listen: "restart ypldap"
 
-- name: restart ypbind
+- name: Restart ypbind
   ansible.builtin.service:
     name: ypbind
     state: restarted
     enabled: true
+  when: baseline_os | lower in ['freebsd', 'openbsd']
+  listen: "restart ypbind"
 
-- name: restart portmap
+- name: Restart portmap
   ansible.builtin.service:
     name: portmap
     state: restarted
     enabled: true
+  when: baseline_os | lower in ['freebsd', 'openbsd']
+  listen: "restart portmap"
 
-- name: update-ca-trust
+- name: Update CA trust store
   ansible.builtin.command:
     cmd: /usr/bin/update-ca-trust
+  when: baseline_os | lower == 'linux'
+  listen: "update ca trust"
 
-- name: augenrules
-  ansible.builtin.command:
-    cmd: /sbin/augenrules --load
-
-- name: run update login.conf
+- name: Rebuild FreeBSD/OpenBSD login database
   ansible.builtin.command:
     cmd: cap_mkdb /etc/login.conf
+  when: baseline_os | lower in ['freebsd', 'openbsd']
+  listen: "rebuild login.conf"
 
-- name: run update master.passwd
+- name: Rebuild FreeBSD/OpenBSD password database
   ansible.builtin.command:
     cmd: pwd_mkdb -p /etc/master.passwd
+  when: baseline_os | lower in ['freebsd', 'openbsd']
+  listen: "rebuild master.passwd"
 
-- name: run update /etc/netgroup
+- name: Rebuild netgroup database
   ansible.builtin.command:
     cmd: netgroup_mkdb /etc/netgroup
+  when: baseline_os | lower in ['freebsd', 'openbsd']
+  listen: "rebuild netgroup"

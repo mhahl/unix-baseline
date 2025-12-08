@@ -1,7 +1,13 @@
----
+- name: Configure time synchronization (FreeBSD - ntpd)
+  ansible.builtin.include_tasks: ntp/ntpd.yaml
+  when: baseline_os | lower == 'freebsd'
+  tags:
+    - baseline:ntp
+    - baseline:ntp:configure
 
-- include_tasks: "ntp/ntpd.yaml"
-  when: "{{ baseline_os | lower in ['freebsd']}}"
-
-- include_tasks: "ntp/chrony.yaml"
-  when: "{{ baseline_os | lower in ['linux']}}"
+- name: Configure time synchronization (Linux - chrony)
+  ansible.builtin.include_tasks: ntp/chrony.yaml
+  when: baseline_os | lower == 'linux'
+  tags:
+    - baseline:ntp
+    - baseline:ntp:configure

@@ -1,2 +1,7 @@
-- ansible.builtin.include_tasks: "netgroups/netgroups_from_api.yaml"
-  when: "{{ baseline_os | lower in ['openbsd', 'freebsd']}}"
+---
+- name: Configure netgroups from API (OpenBSD and FreeBSD only)
+  ansible.builtin.include_tasks: netgroups/netgroups_from_api.yaml
+  when: baseline_os | lower in ['openbsd', 'freebsd']
+  tags:
+    - baseline:netgroups
+    - baseline:netgroups:configure
