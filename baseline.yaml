@@ -31,27 +31,24 @@
     # Conditional configuration tasks
     # ------------------------------------------------------------------
     - name: Apply baseline configuration tasks
-      ansible.builtin.include_tasks: "playbooks/{{ item.task }}.yaml"
+      ansible.builtin.include_tasks: "playbooks/{{ item }}.yaml"
       loop:
-        - { task: cacert,            var: configure_cacert,      default: true }
-        - { task: repos,             var: configure_repos,       default: true }
-        - { task: dns,               var: configure_dns,         default: true }
-        - { task: motd,              var: configure_motd,        default: true }
-        - { task: timezone,          var: configure_timezone,    default: true }
-        - { task: ntp,               var: configure_ntp,         default: true }
-        - { task: skel,              var: configure_skel,        default: true }
-        - { task: auth,              var: configure_sssd,        default: true }
-        - { task: sudoers,           var: configure_sudoers,     default: true }
-        - { task: sshd,              var: configure_sshd,        default: true }
-        - { task: baseline,          var: configure_baseline,    default: true }
-        - { task: syslog,            var: configure_syslog,      default: true }
-        - { task: profile,           var: configure_profile,     default: true }
-        - { task: auditd,            var: configure_auditd,      default: true }
-        - { task: netgroups,         var: configure_netgroups,   default: true }
-        - { task: fleet,             var: configure_fleet,       default: true }
-        - { task: automatic_updates, var: configure_updates,     default: true }
-        - { task: moonlight,         var: true,                  default: true }  # always run
-      when: item.var | default(item.default) | bool
-      tags: "{{ item.task }}"
-      loop_control:
-        label: "{{ item.task }}"
+        - cacert
+        - repos
+        - dns
+        - motd
+        - timezone
+        - ntp
+        - skel
+        - auth
+        - sudoers
+        - sshd
+        - baseline
+        - syslog
+        - profile
+        - auditd
+        - netgroups
+        - fleet
+        - automatic_updates
+        - moonlight
+      when: ('configure_' + item) | default(true)
