@@ -1,60 +1,56 @@
 ---
-- name: Install auditd packages (Linux only)
+- name: Install auditd required packages (Linux only)
   ansible.builtin.package:
     name:
       - audispd-plugins
-      - audit  # recommended to ensure the base package is present
+    state: present
   notify: restart auditd
-  when: baseline_os | lower == 'linux'
   tags:
     - baseline:auditd
     - baseline:auditd:packages
 
-- name: Configure auditd
-  when: baseline_os | lower == 'linux'
+- name: Configure audispd syslog plugin (Linux only)
+  ansible.builtin.template:
+    src: templates/auditd/plugins.d/syslog.conf.j2
+    dest: /etc/audit/plugins.d/syslog.conf
+    owner: root
+    group: root
+    mode: "0640"
+  notify: reload audit rules
   tags:
     - baseline:auditd
-    - baseline:auditd:configure
+    - baseline:auditd:plugins
+    - baseline:auditd:config
 
-  block:
-    - name: Configure audispd syslog plugin
-      ansible.builtin.template:
-        src: templates/auditd/plugins.d/syslog.conf.j2
-        dest: /etc/audit/plugins.d/syslog.conf
-        owner: root
-        group: root
-        mode: "0640"
-      notify: reload audit rules
-      tags:
-        - baseline:auditd:plugins
-
-    - name: Deploy audit rules
-      ansible.builtin.template:
-        src: templates/auditd/rules.d/{{ item }}
-        dest: /etc/audit/rules.d/{{ item }}
-        owner: root
-        group: root
-        mode: "0640"
-      loop:
-        - 10-base-config.rules
-        - 30-actions.rules
-        - 31-audit_rules_usergroup_modification.rules
-        - 32-activity.rules
-        - 33-access.rules
-        - 34-delete.rules
-        - 35-logins.rules
-        - 36-session.rules
-        - 70-system_local.rules
-        - 71-MAC_policy.rules
-        - 72-maintenance.rules
-        - 73-modules.rules
-        - 73-mounts.rules
-        - 74-perm_mod.rules
-        - 75-privileged.rules
-        - 76-setgid.rules
-        - 77-setuid.rules
-        - 78-time_change.rules
-        - 99-finalize.rules
-      notify: reload audit rules
-      tags:
-        - baseline:auditd:rules
+- name: Deploy audit rules (Linux only)
+  ansible.builtin.template:
+    src: "templates/auditd/rules.d/{{ item.src }}"
+    dest: "/etc/audit/rules.d/{{ item.dest | default(item.src) }}"
+    owner: root
+    group: root
+    mode: "0640"
+  loop:
+    - { src: 10-base-config.rules }
+    - { src: 30-actions.rules }
+    - { src: 31-audit_rules_usergroup_modification.rules }
+    - { src: 32-activity.rules }
+    - { src: 33-access.rules }
+    - { src: 34-delete.rules }
+    - { src: 35-logins.rules }
+    - { src: 36-session.rules }
+    - { src: 70-system_local.rules }
+    - { src: 71-MAC_policy.rules }
+    - { src: 72-maintenance.rules }
+    - { src: 73-modules.rules }
+    - { src: 73-mounts.rules }
+    - { src: 74-perm_mod.rules }
+    - { src: 75-privileged.rules }
+    - { src: 76-setgid.rules }
+    - { src: 77-setuid.rules }
+    - { src: 78-time_change.rules }
+    - { src: 99-finalize.rules }
+  notify: reload audit rules
+  tags:
+    - baseline:auditd
+    - baseline:auditd:rules
+    - baseline:auditd:config
