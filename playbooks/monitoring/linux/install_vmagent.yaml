@@ -129,7 +129,3 @@
     enabled: yes
     state: started
     daemon_reload: yes
-
-  # in case unit was updated
-
-  handlers:
