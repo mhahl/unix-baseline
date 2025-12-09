@@ -85,3 +85,16 @@
     cmd: netgroup_mkdb /etc/netgroup
   when: baseline_os | lower in ['freebsd', 'openbsd']
   listen: "rebuild netgroup"
+
+- name: Daemon reload
+  systemd:
+    daemon_reload: yes
+  listen: "daemon reload"
+  when: baseline_os | lower == 'linux'
+
+- name: Restart vmagent
+  systemd:
+    name: vmagent
+    state: restarted
+  listen: "restart vmagent"
+  when: baseline_os | lower == 'linux'

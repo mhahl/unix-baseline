@@ -6,6 +6,10 @@ sigaint_api: "https://api.sigaint.au/api/v1"
 # Fleet configuration
 fleet_rpm_url: https://f000.backblazeb2.com/file/sigaint-public/fleet-osquery-1.50.1.x86_64.rpm
 
+# VMagent Metrics
+vmagent_version: "latest"
+vmagent_remote_write_url: "https://metrics-ingest.sigaint.au/api/v1/write"
+
 # Supported distributions
 sigaint_soe_supported_distributions:
   - FreeBSD

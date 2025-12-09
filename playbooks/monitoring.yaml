@@ -1,0 +1,7 @@
+---
+- name: Configure monitoring (Linux only)
+  ansible.builtin.include_tasks: monitoring/linux.yaml
+  when: baseline_os | lower == 'linux'
+  tags:
+    - baseline:monitoring
+    - baseline:fleet:monitoring

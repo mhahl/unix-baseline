@@ -1,0 +1,135 @@
+---
+- name: Resolve "latest" → real tag
+  when: vmagent_version == "latest"
+  uri:
+    url: https://api.github.com/repos/VictoriaMetrics/VictoriaMetrics/releases/latest
+    return_content: yes
+  register: latest_release
+  run_once: true
+
+- name: Set final version tag
+  set_fact:
+    vmagent_tag: >-
+      {{ (vmagent_version == 'latest') | ternary(latest_release.json.tag_name, vmagent_version) }}
+
+- name: Check age of current vmagent binary
+  stat:
+    path: /usr/local/bin/vmagent
+  register: vmagent_stat
+  ignore_errors: yes
+
+- name: Decide whether to update (older than 30 days OR missing)
+  set_fact:
+    update_vmagent: >-
+      {{ (vmagent_stat.stat is not defined) or
+         (vmagent_stat.stat.exists == false) or
+         ((ansible_date_time.epoch | int) - (vmagent_stat.stat.mtime | int) > 30 * 86400) }}
+
+- name: Show decision
+  debug:
+    msg: >-
+      {{ 'UPDATE NEEDED' if update_vmagent else 'Binary is newer than 30 days → skipping' }}
+
+- name: Stop vmagent before replacement
+  when: update_vmagent
+  systemd:
+    name: vmagent
+    state: stopped
+  ignore_errors: yes
+
+- name: Download latest vmutils tarball
+  when: update_vmagent
+  get_url:
+    url: "https://github.com/VictoriaMetrics/VictoriaMetrics/releases/download/{{ vmagent_tag }}/vmutils-amd64-{{ vmagent_tag }}. }}.tar.gz"
+    dest: /tmp/vmutils.tar.gz
+    mode: '0644'
+
+- name: Remove old binary
+  when: update_vmagent
+  file:
+    path: /usr/local/bin/vmagent
+    state: absent
+
+- name: Install new binary
+  when: update_vmagent
+  unarchive:
+    src: /tmp/vmutils.tar.gz
+    dest: /usr/local/bin
+    remote_src: yes
+    creates: /usr/local/bin/vmagent
+    mode: '0755'
+
+- name: Clean up
+  when: update_vmagent
+  file:
+    path: /tmp/vmutils.tar.gz
+    state: absent
+
+- name: Ensure config directory exists
+  file:
+    path: /etc/vmagent
+    state: directory
+    mode: '0755'
+
+- name: Deploy scrape config (self-scrape)
+  copy:
+    dest: /etc/vmagent/vmagent.yml
+    content: |
+      scrape_configs:
+        - job_name: vmagent
+          static_configs:
+            - targets: ['127.0.0.1:8429']
+          scrape_interval: 15s
+    mode: '0644'
+  notify: Restart vmagent
+
+- name: Deploy systemd unit
+  copy:
+    dest: /etc/systemd/system/vmagent.service
+    content: |
+      [Unit]
+      Description=VictoriaMetrics Agent
+      After=network-online.target
+
+      [Service]
+      Type=simple
+      User=root
+      ExecStart=/usr/local/bin/vmagent \
+        -promscrape.config=/etc/vmagent/vmagent.yml \
+        -remoteWrite.url={{ remote_write_url }} \
+        -remoteWrite.basicAuth.username={{ vmagent_auth_username }} \
+        -remoteWrite.basicAuth.password={{ vmagent_auth_password }} \
+        -httpListenAddr=:8429
+      Restart=always
+      RestartSec=5
+      LimitNOFILE=1000000
+
+      [Install]
+      WantedBy=multi-user.target
+    mode: '0644'
+  notify:
+    - Daemon reload
+    - Restart vmagent
+
+- name: Whitelist vmagent in fapolicyd (only if fapolicyd exists)
+  when: ansible_facts.packages is defined and 'fapolicyd' in ansible_facts.packages
+  block:
+    - command: fapolicyd-cli --file add /usr/local/bin/vmagent --trust-file vmagent-github
+      args:
+        creates: /etc/fapolicyd/fapolicyd.trust.d/vmagent-github
+
+    - command: fapolicyd-cli --update
+    - systemd:
+        name: fapolicyd
+        state: restarted
+
+- name: Ensure vmagent is running
+  systemd:
+    name: vmagent
+    enabled: yes
+    state: started
+    daemon_reload: yes
+
+  # in case unit was updated
+
+  handlers:
