@@ -50,5 +50,6 @@
         - netgroups
         - fleet
         - automatic_updates
+        - monitoring
         - moonlight
       when: ('configure_' + item) | default(true)
