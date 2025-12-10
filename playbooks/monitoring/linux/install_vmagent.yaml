@@ -96,7 +96,7 @@
       User=root
       ExecStart=/usr/local/bin/vmagent \
         -promscrape.config=/etc/vmagent/vmagent.yml \
-        -remoteWrite.url={{ remote_write_url }} \
+        -remoteWrite.url={{ vmagent_remote_write_url }} \
         -remoteWrite.basicAuth.username={{ vmagent_auth_username }} \
         -remoteWrite.basicAuth.password={{ vmagent_auth_password }} \
         -httpListenAddr=:8429
