@@ -1,0 +1,126 @@
+---
+- name: Resolve "latest" → real tag from GitHub
+  when: node_exporter_version == "latest"
+  uri:
+    url: https://api.github.com/repos/prometheus/node_exporter/releases/latest
+    return_content: yes
+  register: ne_latest
+  delegate_to: localhost
+  run_once: true
+
+- name: Set final version tag
+  set_fact:
+    ne_tag: >-
+      {{ (node_exporter_version == 'latest') | ternary(ne_latest.json.tag_name, node_exporter_version) }}
+
+- name: Check age of current node_exporter binary
+  stat:
+    path: /usr/local/bin/node_exporter
+  register: ne_stat
+  ignore_errors: yes
+
+- name: Decide whether to update (missing OR >30 days old)
+  set_fact:
+    update_needed: >-
+      {{ (ne_stat.stat is not defined) or
+         (ne_stat.stat.exists == false) or
+         ((ansible_date_time.epoch | int) - (ne_stat.stat.mtime | int) > 30 * 86400) }}
+
+- name: Stop node_exporter before replacement
+  when: update_needed
+  systemd:
+    name: node_exporter
+    state: stopped
+  ignore_errors: yes
+
+- name: Download and install new binary only if needed
+  when: update_needed
+  block:
+    - name: Download node_exporter tarball
+      get_url:
+        url: "https://github.com/prometheus/node_exporter/releases/download/{{ ne_tag }}/node_exporter-{{ ne_tag | regex_replace('^v', '') }}.linux-amd64.tar.gz"
+        dest: /tmp/node_exporter.tar.gz
+        mode: '0644'
+
+    - name: Remove old binary
+      file:
+        path: /usr/local/bin/node_exporter
+        state: absent
+
+    - name: Extract new binary
+      unarchive:
+        src: /tmp/node_exporter.tar.gz
+        dest: /tmp
+        remote_src: yes
+
+    - name: Move binary to final location
+      copy:
+        src: "/tmp/node_exporter-{{ ne_tag | regex_replace('^v', '') }}.linux-amd64/node_exporter"
+        dest: /usr/local/bin/node_exporter
+        mode: '0755'
+        remote_src: yes
+
+    - name: Cleanup
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /tmp/node_exporter.tar.gz
+        - "/tmp/node_exporter-{{ ne_tag | regex_replace('^v', '') }}.linux-amd64"
+
+# ──────────────────────────────
+# Systemd service + hostname labels via command-line flags
+# ───────────────────────────────
+- name: Deploy systemd unit with hostname labels
+  copy:
+    dest: /etc/systemd/system/node_exporter.service
+    content: |
+      [Unit]
+      Description=Prometheus Node Exporter
+      After=network-online.target
+
+      [Service]
+      Type=simple
+      User=root
+      ExecStart=/usr/local/bin/node_exporter \
+        --web.listen-address=127.0.0.1:9100 \
+        --collector.systemd \
+        --collector.processes \
+        --collector.diskstats.ignored-devices="^(ram|loop|fd|(h|s|v|xv)d[a-z]|nvme\\d+n\\d+p)\\d+$" \
+        --collector.textfile.directory=/var/lib/node_exporter/textfile_collector \
+        --no-collector.hwmon \
+        --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/) \
+        --collector.netdev.device-exclude="^(veth|lo|docker|flannel|cali|cbr|kube-ipvs)" \
+        --collector.vmstat.fields="(pgpgin|pgpgout|pswpin|pswpout|pgfault|pgmajfault)" \
+        --log.format=json
+      Restart=always
+      RestartSec=5
+
+      [Install]
+      WantedBy=multi-user.target
+    mode: '0644'
+  notify:
+    - Daemon reload
+    - Restart node_exporter
+
+# ──────────────────────────────
+# fapolicyd whitelist (RHEL 8/9/10)
+# ──────────────────────────────
+- name: Whitelist node_exporter in fapolicyd
+  when: ansible_facts.packages is defined and 'fapolicyd' in ansible_facts.packages
+  block:
+    - command: fapolicyd-cli --file add /usr/local/bin/node_exporter --trust-file node-exporter-github
+      args:
+        creates: /etc/fapolicyd/fapolicyd.trust.d/node-exporter-github
+
+    - command: fapolicyd-cli --update
+    - systemd:
+        name: fapolicyd
+        state: restarted
+
+- name: Ensure node_exporter is enabled and running
+  systemd:
+    name: node_exporter
+    enabled: yes
+    state: started
+    daemon_reload: yes
