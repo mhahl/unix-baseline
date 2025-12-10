@@ -115,7 +115,7 @@
         -remoteWrite.url={{ vmagent_remote_write_url }} \
         -remoteWrite.basicAuth.username={{ vmagent_auth_username }} \
         -remoteWrite.basicAuth.password={{ vmagent_auth_password }} \
-        -httpListenAddr=:8429
+        -httpListenAddr=127.0.0.1:8429
       Restart=always
       RestartSec=5
       LimitNOFILE=1000000

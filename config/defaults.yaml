@@ -26,7 +26,7 @@ dns_search:
 
 # System settings
 timezone: "Australia/Sydney"
-syslog_server: "syslog.v4.dmz.sigaint.au:514"
+syslog_server: "prd-4e60.ts.sigaint.au:514"
 
 # DNS servers for systemd-resolved (with DNS over TLS)
 systemd_resolved_dns:
