@@ -40,7 +40,7 @@
 - name: Download latest vmutils tarball
   when: update_vmagent
   get_url:
-    url: "https://github.com/VictoriaMetrics/VictoriaMetrics/releases/download/{{ vmagent_tag }}/vmutils-amd64-{{ vmagent_tag }}.tar.gz"
+    url: "https://github.com/VictoriaMetrics/VictoriaMetrics/releases/download/{{ vmagent_tag }}/vmutils-linux-amd64-{{ vmagent_tag }}.tar.gz"
     dest: /tmp/vmutils.tar.gz
     mode: '0644'
 
