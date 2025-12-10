@@ -14,7 +14,7 @@
 
 - name: Check age of current vmagent binary
   stat:
-    path: /usr/local/bin/vmagent
+    path: /usr/local/bin/vmagent-prod
   register: vmagent_stat
   ignore_errors: yes
 
