@@ -5,8 +5,8 @@
       - rsyslog
     state: present
   tags:
-    - baseline:rsyslog
-    - baseline:rsyslog:packages
+    - baseline:syslog
+    - baseline:syslog:packages
 
 - name:  Deploy configuration files
   ansible.builtin.template:
@@ -17,10 +17,10 @@
     mode: "{{ item.mode | default('0644') }}"
   loop:
     - { template: syslog/rsyslog.conf.j2, dest: /etc/rsyslog.conf, mode: "0644" }
-  notify: restart rsyslog
+  notify: restart syslog
   tags:
-    - baseline:rsyslog
-    - baseline:rsyslog:config
+    - baseline:syslog
+    - baseline:syslog:config
 
 - name: Ensure service is enabled and running
   ansible.builtin.service:
@@ -28,5 +28,5 @@
     state: started
     enabled: true
   tags:
-    - baseline:rsyslog
-    - baseline:rsyslog:service
+    - baseline:syslog
+    - baseline:syslog:service
