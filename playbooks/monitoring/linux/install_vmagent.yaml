@@ -82,8 +82,14 @@
           env:      "production"
       
       scrape_configs:
-        - job_name: vmagent
+        - job_name: node_exporter
           static_configs:
+            - targets: ['127.0.0.1:9100']
+              labels:
+                instance: "{{ ansible_facts.hostname }}"
+                host:     "{{ ansible_facts.fqdn }}"
+        - job_name: vmagent
+          static_configs:    
             - targets: ['127.0.0.1:8429']
               labels:
                 instance: "{{ ansible_facts.hostname }}"
