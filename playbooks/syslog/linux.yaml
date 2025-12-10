@@ -24,7 +24,7 @@
 
 - name: Ensure service is enabled and running
   ansible.builtin.service:
-    name: syslog
+    name: rsyslog
     state: started
     enabled: true
   tags:
