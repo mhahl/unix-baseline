@@ -87,7 +87,6 @@
         --collector.systemd \
         --collector.processes \
         --collector.diskstats.ignored-devices="^(ram|loop|fd|(h|s|v|xv)d[a-z]|nvme\\d+n\\d+p)\\d+$" \
-        --collector.textfile.directory=/var/lib/node_exporter/textfile_collector \
         --no-collector.hwmon \
         --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/) \
         --collector.netdev.device-exclude="^(veth|lo|docker|flannel|cali|cbr|kube-ipvs)" \
