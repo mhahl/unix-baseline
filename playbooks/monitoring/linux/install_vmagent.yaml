@@ -56,7 +56,7 @@
     src: /tmp/vmutils.tar.gz
     dest: /usr/local/bin
     remote_src: yes
-    creates: /usr/local/bin/vmagent
+    creates: /usr/local/bin/vmagent-prod
     mode: '0755'
 
 - name: Clean up
@@ -94,7 +94,7 @@
       [Service]
       Type=simple
       User=root
-      ExecStart=/usr/local/bin/vmagent \
+      ExecStart=/usr/local/bin/vmagent-prod \
         -promscrape.config=/etc/vmagent/vmagent.yml \
         -remoteWrite.url={{ vmagent_remote_write_url }} \
         -remoteWrite.basicAuth.username={{ vmagent_auth_username }} \
@@ -114,7 +114,7 @@
 - name: Whitelist vmagent in fapolicyd (only if fapolicyd exists)
   when: ansible_facts.packages is defined and 'fapolicyd' in ansible_facts.packages
   block:
-    - command: fapolicyd-cli --file add /usr/local/bin/vmagent --trust-file vmagent-github
+    - command: fapolicyd-cli --file add /usr/local/bin/vmagent-prod --trust-file vmagent-github
       args:
         creates: /etc/fapolicyd/fapolicyd.trust.d/vmagent-github
 
