@@ -75,12 +75,21 @@
   copy:
     dest: /etc/vmagent/vmagent.yml
     content: |
+      global:
+        external_labels:
+          hostname: "{{ ansible_facts.hostname }}"
+          fqdn:     "{{ ansible_facts.fqdn }}"
+          env:      "production"
+      
       scrape_configs:
         - job_name: vmagent
           static_configs:
             - targets: ['127.0.0.1:8429']
+              labels:
+                instance: "{{ ansible_facts.hostname }}"
+                host:     "{{ ansible_facts.fqdn }}"
           scrape_interval: 15s
-    mode: '0644'
+        mode: '0644'
   notify: Restart vmagent
 
 - name: Deploy systemd unit
