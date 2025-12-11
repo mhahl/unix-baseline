@@ -80,7 +80,7 @@
     - "{{ blackbox_exporter_config_dir }}"
     - "{{ blackbox_exporter_data_dir }}"
 
-- name: Deploy default blackbox.yml config (ICMP + HTTP + DNS + TCP)
+- name: Deploy default blackbox.yaml config (ICMP + HTTP + DNS + TCP)
   copy:
     dest: "{{ blackbox_exporter_config_dir }}/blackbox.yaml"
     content: |
@@ -115,7 +115,7 @@
             valid_rcodes:
               - NOERROR
     mode: '0644'
-  notify: Restart blackbox-exporter
+  notify: Restart blackbox_exporter
 
 - name: Deploy systemd unit
   copy:
@@ -139,7 +139,7 @@
     mode: '0644'
   notify:
     - Daemon reload
-    - Restart blackbox-exporter
+    - Restart blackbox_exporter
 
 - name: fapolicyd whitelist (RHEL 8/9/10)
   when: ansible_facts.packages is defined and 'fapolicyd' in ansible_facts.packages
