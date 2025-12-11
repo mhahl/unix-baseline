@@ -13,6 +13,13 @@ vmagent_remote_write_url: "https://metrics-ingest.sigaint.au/api/v1/write"
 # Node exporter
 node_exporter_version: "latest"
 
+# Blackbox exporter
+blackbox_version: "latest"
+blackbox_exporter_listen_port: 9115
+blackbox_exporter_config_dir: /etc/blackbox
+blackbox_exporter_data_dir: /var/lib/blackbox
+
+
 # Supported distributions
 sigaint_soe_supported_distributions:
   - FreeBSD

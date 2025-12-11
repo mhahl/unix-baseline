@@ -5,7 +5,6 @@
     url: https://api.github.com/repos/prometheus/node_exporter/releases/latest
     return_content: yes
   register: ne_latest
-  delegate_to: localhost
   run_once: true
 
 - name: Set final version tag
@@ -21,20 +20,25 @@
 
 - name: Decide whether to update (missing OR >30 days old)
   set_fact:
-    update_needed: >-
+    update_node_exporter: >-
       {{ (ne_stat.stat is not defined) or
          (ne_stat.stat.exists == false) or
          ((ansible_date_time.epoch | int) - (ne_stat.stat.mtime | int) > 30 * 86400) }}
 
+- name: Show decision
+  debug:
+    msg: >-
+      {{ 'UPDATE NEEDED' if update_node_exporter else 'Binary is newer than 30 days → skipping' }}
+
 - name: Stop node_exporter before replacement
-  when: update_needed
+  when: update_node_exporter
   systemd:
     name: node_exporter
     state: stopped
   ignore_errors: yes
 
 - name: Download and install new binary only if needed
-  when: update_needed
+  when: update_node_exporter
   block:
     - name: Download node_exporter tarball
       get_url:
@@ -59,6 +63,9 @@
         dest: /usr/local/bin/node_exporter
         mode: '0755'
         remote_src: yes
+
+    - name: Update binary mtime
+      ansible.builtin.shell: touch /usr/local/bin/node_exporter
 
     - name: Cleanup
       file:
@@ -122,4 +129,3 @@
     name: node_exporter
     enabled: yes
     state: started
-    daemon_reload: yes

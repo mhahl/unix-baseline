@@ -3,5 +3,8 @@
 - name: Install and configure node_exporter
   ansible.builtin.include_tasks: linux/install_node_exporter.yaml
 
+- name: Install and configure blackbox_exporter
+  ansible.builtin.include_tasks: linux/install_blackbox_exporter.yaml
+
 - name: Install and configure vmagent
   ansible.builtin.include_tasks: linux/install_vmagent.yaml
