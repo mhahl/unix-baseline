@@ -49,12 +49,14 @@
     mode: '0644'
 
 - name: Extract and install binary
+  when: update_needed
   unarchive:
     src: /tmp/blackbox_exporter.tar.gz
     dest: /tmp
     remote_src: yes
 
 - name: Move binary to final location
+  when: update_needed
   copy:
     src: "/tmp/blackbox_exporter-{{ bb_tag | regex_replace('^v', '') }}.linux-amd64/blackbox_exporter"
     dest: /usr/local/bin/blackbox_exporter
