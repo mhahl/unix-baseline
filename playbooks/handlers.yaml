@@ -105,3 +105,10 @@
     state: restarted
   listen: "restart node_exporter"
   when: baseline_os | lower == 'linux'
+
+- name: Restart blackbox_exporter
+  systemd:
+    name: blackbox-exporter
+    state: restarted
+  listen: "restart blackbox_exporter"
+  when: baseline_os | lower == 'linux'

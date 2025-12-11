@@ -1,0 +1,161 @@
+
+- name: Resolve "latest" → real version tag
+  when: blackbox_version == "latest"
+  uri:
+    url: https://api.github.com/repos/prometheus/blackbox_exporter/releases/latest
+    return_content: yes
+  register: bb_latest
+  run_once: true
+
+- name: Set final version tag
+  set_fact:
+    bb_tag: >-
+      {{ (blackbox_version == 'latest') | ternary(bb_latest.json.tag_name, blackbox_version) }}
+
+- name: Show version being installed
+  debug:
+    msg: "Installing blackbox_exporter {{ bb_tag }}"
+
+- name: Check age of existing blackbox_exporter binary
+  stat:
+    path: /usr/local/bin/blackbox_exporter
+  register: bb_stat
+  ignore_errors: yes
+
+- name: Decide whether to update (missing OR older than 30 days)
+  set_fact:
+    update_needed: >-
+      {{ (bb_stat.stat is not defined) or
+         (bb_stat.stat.exists == false) or
+         ((ansible_date_time.epoch | int) - (bb_stat.stat.mtime | int) > 30 * 86400) }}
+
+- name: Show update decision
+  debug:
+    msg: >-
+      {{ 'Updating blackbox_exporter to {{ bb_tag }}' if update_needed else 'blackbox_exporter is up to date (less than 30 days old)' }}
+
+- name: Stop blackbox_exporter if running (safe replace)
+  when: update_needed
+  systemd:
+    name: blackbox-exporter
+    state: stopped
+  ignore_errors: yes
+
+- name: Download blackbox_exporter tarball
+  when: update_needed
+  get_url:
+    url: "https://github.com/prometheus/blackbox_exporter/releases/download/{{ bb_tag }}/blackbox_exporter-{{ bb_tag | regex_replace('^v', '') }}.linux-amd64.tar.gz"
+    dest: /tmp/blackbox_exporter.tar.gz
+    mode: '0644'
+
+- name: Extract and install binary
+  unarchive:
+    src: /tmp/blackbox_exporter.tar.gz
+    dest: /tmp
+    remote_src: yes
+
+- name: Move binary to final location
+  copy:
+    src: "/tmp/blackbox_exporter-{{ bb_tag | regex_replace('^v', '') }}.linux-amd64/blackbox_exporter"
+    dest: /usr/local/bin/blackbox_exporter
+    mode: '0755'
+    remote_src: yes
+
+- name: Cleanup temp files
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /tmp/blackbox_exporter.tar.gz
+    - "/tmp/blackbox_exporter-{{ bb_tag | regex_replace('^v', '') }}.linux-amd64"
+
+- name: Create config and data directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - "{{ blackbox_exporter_config_dir }}"
+    - "{{ blackbox_exporter_data_dir }}"
+
+- name: Deploy default blackbox.yml config (ICMP + HTTP + DNS + TCP)
+  copy:
+    dest: "{{ blackbox_exporter_config_dir }}/blackbox.yaml"
+    content: |
+      modules:
+        icmp:
+          prober: icmp
+          timeout: 5s
+          icmp:
+            preferred_ip_protocol: ip4
+
+        http_2xx:
+          prober: http
+          timeout: 10s
+          http:
+            preferred_ip_protocol: ip4
+            fail_if_ssl: false
+            fail_if_not_ssl: false
+            method: GET
+            fail_if_body_not_matches_regexp:
+              - ".*"
+
+        tcp_connect:
+          prober: tcp
+          timeout: 5s
+
+        dns_udp:
+          prober: dns
+          timeout: 10s
+          dns:
+            query_name: "google.com"
+            query_type: A
+            valid_rcodes:
+              - NOERROR
+    mode: '0644'
+  notify: Restart blackbox-exporter
+
+- name: Deploy systemd unit
+  copy:
+    dest: /etc/systemd/system/blackbox-exporter.service
+    content: |
+      [Unit]
+      Description=Prometheus Blackbox Exporter
+      After=network-online.target
+
+      [Service]
+      Type=simple
+      User=root
+      ExecStart=/usr/local/bin/blackbox_exporter \
+        --config.file={{ blackbox_exporter_config_dir }}/blackbox.yaml \
+        --web.listen-address=:{{ blackbox_exporter_listen_port }}
+      Restart=always
+      RestartSec=5
+
+      [Install]
+      WantedBy=multi-user.target
+    mode: '0644'
+  notify:
+    - Daemon reload
+    - Restart blackbox-exporter
+
+- name: fapolicyd whitelist (RHEL 8/9/10)
+  when: ansible_facts.packages is defined and 'fapolicyd' in ansible_facts.packages
+  block:
+    - command: fapolicyd-cli --file add /usr/local/bin/blackbox_exporter --trust-file blackbox-exporter
+      args:
+        creates: /etc/fapolicyd/fapolicyd.trust.d/blackbox-exporter
+
+    - command: fapolicyd-cli --update
+    - systemd:
+        name: fapolicyd
+        state: restarted
+
+- name: Ensure blackbox-exporter is enabled and running
+  systemd:
+    name: blackbox-exporter
+    enabled: yes
+    state: started
+    daemon_reload: yes
