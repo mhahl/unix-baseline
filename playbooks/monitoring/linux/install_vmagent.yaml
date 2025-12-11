@@ -59,8 +59,11 @@
     creates: /usr/local/bin/vmagent-prod
     mode: '0755'
 
-- name: Clean up
+- name: Update binary mtime
   when: update_vmagent
+  ansible.builtin.shell: touch /usr/local/bin/vmagent-prod
+
+- name: Clean up
   file:
     path: /tmp/vmutils.tar.gz
     state: absent
@@ -159,4 +162,3 @@
     name: vmagent
     enabled: yes
     state: started
-    daemon_reload: yes

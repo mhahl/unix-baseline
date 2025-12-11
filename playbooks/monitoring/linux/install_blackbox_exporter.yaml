@@ -24,7 +24,7 @@
 
 - name: Decide whether to update (missing OR older than 30 days)
   set_fact:
-    update_needed: >-
+    update_blackbox_exporter: >-
       {{ (bb_stat.stat is not defined) or
          (bb_stat.stat.exists == false) or
          ((ansible_date_time.epoch | int) - (bb_stat.stat.mtime | int) > 30 * 86400) }}
@@ -32,36 +32,40 @@
 - name: Show update decision
   debug:
     msg: >-
-      {{ 'Updating blackbox_exporter to {{ bb_tag }}' if update_needed else 'blackbox_exporter is up to date (less than 30 days old)' }}
+      {{ 'Updating blackbox_exporter to {{ bb_tag }}' if update_blackbox_exporter else 'blackbox_exporter is up to date (less than 30 days old)' }}
 
 - name: Stop blackbox_exporter if running (safe replace)
-  when: update_needed
+  when: update_blackbox_exporter
   systemd:
     name: blackbox-exporter
     state: stopped
   ignore_errors: yes
 
 - name: Download blackbox_exporter tarball
-  when: update_needed
+  when: update_blackbox_exporter
   get_url:
     url: "https://github.com/prometheus/blackbox_exporter/releases/download/{{ bb_tag }}/blackbox_exporter-{{ bb_tag | regex_replace('^v', '') }}.linux-amd64.tar.gz"
     dest: /tmp/blackbox_exporter.tar.gz
     mode: '0644'
 
 - name: Extract and install binary
-  when: update_needed
+  when: update_blackbox_exporter
   unarchive:
     src: /tmp/blackbox_exporter.tar.gz
     dest: /tmp
     remote_src: yes
 
 - name: Move binary to final location
-  when: update_needed
+  when: update_blackbox_exporter
   copy:
     src: "/tmp/blackbox_exporter-{{ bb_tag | regex_replace('^v', '') }}.linux-amd64/blackbox_exporter"
     dest: /usr/local/bin/blackbox_exporter
     mode: '0755'
     remote_src: yes
+
+- name: Update binary mtime
+  when: update_blackbox_exporter
+  ansible.builtin.shell: touch /usr/local/bin/blackbox_exporter
 
 - name: Cleanup temp files
   file:
