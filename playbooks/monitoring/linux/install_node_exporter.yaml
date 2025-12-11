@@ -26,6 +26,11 @@
          (ne_stat.stat.exists == false) or
          ((ansible_date_time.epoch | int) - (ne_stat.stat.mtime | int) > 30 * 86400) }}
 
+- name: Show decision
+  debug:
+    msg: >-
+      {{ 'UPDATE NEEDED' if update_needed else 'Binary is newer than 30 days → skipping' }}
+
 - name: Stop node_exporter before replacement
   when: update_needed
   systemd:
