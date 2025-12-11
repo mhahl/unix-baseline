@@ -9,6 +9,7 @@ fleet_rpm_url: https://f000.backblazeb2.com/file/sigaint-public/fleet-osquery-1.
 # VMagent Metrics
 vmagent_version: "latest"
 vmagent_remote_write_url: "https://metrics-ingest.sigaint.au/api/v1/write"
+vmagent_environment: "production"
 
 # Node exporter
 node_exporter_version: "latest"
@@ -33,7 +34,7 @@ dns_search:
 
 # System settings
 timezone: "Australia/Sydney"
-syslog_server: "prd-4e60.ts.sigaint.au:514"
+syslog_server: "syslog.v4.ts.sigaint.au:514"
 
 # DNS servers for systemd-resolved (with DNS over TLS)
 systemd_resolved_dns:

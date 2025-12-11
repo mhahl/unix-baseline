@@ -82,7 +82,7 @@
         external_labels:
           hostname: "{{ ansible_facts.hostname }}"
           fqdn:     "{{ ansible_facts.fqdn }}"
-          env:      "production"
+          env:      "{{vmagent_environment | default('production')}}"
       
       scrape_configs:
       
