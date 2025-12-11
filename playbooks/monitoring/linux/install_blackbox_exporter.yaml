@@ -96,7 +96,6 @@
           timeout: 5s
           icmp:
             preferred_ip_protocol: ip4
-            privileged: true
     mode: '0644'
   notify: Restart blackbox_exporter
 
