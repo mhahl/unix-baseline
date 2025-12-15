@@ -20,6 +20,9 @@ blackbox_exporter_listen_port: 9115
 blackbox_exporter_config_dir: /etc/blackbox
 blackbox_exporter_data_dir: /var/lib/blackbox
 
+# Vector
+vector_config_dest: /etc/vector/vector.yaml
+vector_ingest_url: http://syslog.v4.ts.sigaint.au:9428/insert/elasticsearch/
 
 # Supported distributions
 sigaint_soe_supported_distributions:
@@ -34,7 +37,12 @@ dns_search:
 
 # System settings
 timezone: "Australia/Sydney"
+
+# Syslog server has been replaced with Vector
+# Only for Linux servers. *BSD will set this to true.
+#
 syslog_server: "syslog.v4.ts.sigaint.au:514"
+syslog_server_enabled: false
 
 # DNS servers for systemd-resolved (with DNS over TLS)
 systemd_resolved_dns:

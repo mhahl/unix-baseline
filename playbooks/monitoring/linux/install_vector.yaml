@@ -1,0 +1,39 @@
+---
+- name: Add Vector YUM repository
+  copy:
+    dest: /etc/yum.repos.d/vector.repo
+    content: |
+      [vector]
+      name = Vector
+      baseurl = https://yum.vector.dev/stable/vector-0/$basearch/
+      enabled=1
+      gpgcheck=1
+      repo_gpgcheck=1
+      priority=1
+      gpgkey=https://keys.datadoghq.com/DATADOG_RPM_KEY_CURRENT.public
+             https://keys.datadoghq.com/DATADOG_RPM_KEY_B01082D3.public
+             https://keys.datadoghq.com/DATADOG_RPM_KEY_FD4BF915.public
+  register: repo_added
+
+- name: Refresh package cache if repo added
+  dnf:
+    update_cache: yes
+  when: repo_added.changed
+
+- name: Install Vector package
+  dnf:
+    name: vector
+    state: latest
+
+- name: Deploy sample Vector configuration from template
+  template:
+    src: templates/vector/vector.yaml.j2
+    dest: "{{ vector_config_dest }}"
+    mode: '0644'
+  notify: Restart Vector
+
+- name: Ensure Vector service is enabled and started
+  systemd:
+    name: vector
+    enabled: yes
+    state: started

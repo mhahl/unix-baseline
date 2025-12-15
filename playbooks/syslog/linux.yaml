@@ -1,5 +1,5 @@
 ---
-- name:  Install required packages
+- name: Install required packages
   ansible.builtin.package:
     name:
       - rsyslog
@@ -8,7 +8,7 @@
     - baseline:syslog
     - baseline:syslog:packages
 
-- name:  Deploy configuration files
+- name: Deploy configuration files
   ansible.builtin.template:
     src: "../templates/{{ item.template }}"
     dest: "{{ item.dest }}"
@@ -18,15 +18,27 @@
   loop:
     - { template: syslog/rsyslog.conf.j2, dest: /etc/rsyslog.conf, mode: "0644" }
   notify: restart syslog
+  when: syslog_server_enabled | bool
   tags:
     - baseline:syslog
     - baseline:syslog:config
 
-- name: Ensure service is enabled and running
+- name: Stop and disable rsyslog when syslog_server_enabled is false
+  ansible.builtin.service:
+    name: rsyslog
+    state: stopped
+    enabled: false
+  when: not (syslog_server_enabled | bool)
+  tags:
+    - baseline:syslog
+    - baseline:syslog:service
+
+- name: Ensure rsyslog is enabled and running when syslog_server_enabled is true
   ansible.builtin.service:
     name: rsyslog
     state: started
     enabled: true
+  when: syslog_server_enabled | bool
   tags:
     - baseline:syslog
     - baseline:syslog:service
