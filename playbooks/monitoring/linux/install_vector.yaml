@@ -49,7 +49,7 @@
     mode: '0644'
   when: vector_enabled | bool
   notify:
-    - reload systemd
+    - daemon reload
     - restart vector
   tags:
     - baseline:vector
