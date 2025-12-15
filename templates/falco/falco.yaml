@@ -1,0 +1,51 @@
+# This is a minimal, functional configuration for Falco on a host (RHEL/Fedora)
+# It uses the default rules managed by falcoctl (recommended for modern installations)
+# Customizations: JSON output enabled, log to syslog, increased buffer size for high-load systems
+
+json_output: true
+json_include_output_property: true
+json_include_tags_property: true
+
+log_stderr: true
+log_syslog: true
+log_level: info
+
+# Rules files - rely on falcoctl-managed defaults
+# The package installs and falcoctl handles /etc/falco/falco_rules.yaml etc.
+rules_files:
+  - /etc/falco/falco_rules.yaml
+  - /etc/falco/falco_rules.local.yaml   # For your custom rules/overrides
+  - /etc/falco/rules.d                  # Directory for additional custom rules files
+
+watch_config_files: true
+
+# Buffer size for system calls (increase if you see dropped events)
+buffered_outputs: true
+syscall_event_buffer_size: 67108864   # 64MB (default is smaller on some setups)
+
+# Output configuration
+priority: debug                       # Minimum priority to output (adjust to warning/info in prod)
+output_timeout: 2000
+
+# Example: Forward alerts to stdout in JSON (useful with Vector or other log shippers)
+# You can add more outputs like file, syslog, or program
+
+# HTTP output example (if you want to send to a webhook)
+# http_output:
+#   enabled: true
+#   url: http://your-webhook-endpoint
+
+# Program output example (pipe to another tool)
+# program_output:
+#   enabled: true
+#   keep_alive: true
+#   program: "jq '{time: .time, priority: .priority, rule: .rule, output: .output}'"
+
+# Metrics (optional, for Prometheus)
+metrics:
+  enabled: true
+  # output_rule: true
+
+# gRPC output (optional)
+# grpc_output:
+#   enabled: false

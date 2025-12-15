@@ -1,0 +1,37 @@
+- name: Import Falco GPG key
+  rpm_key:
+    key: https://falco.org/repo/falcosecurity-packages.asc
+    state: present
+
+- name: Add Falco YUM repository
+  get_url:
+    url: https://falco.org/repo/falcosecurity-rpm.repo
+    dest: /etc/yum.repos.d/falcosecurity.repo
+    mode: '0644'
+  register: repo_added
+
+- name: Refresh package cache if repo added
+  dnf:
+    update_cache: yes
+  when: repo_added.changed
+
+- name: Install Falco package non-interactively with modern_ebpf driver
+  dnf:
+    name: falco
+    state: latest
+  environment:
+    FALCO_FRONTEND: noninteractive
+    FALCO_DRIVER_CHOICE: modern_ebpf
+
+- name: Deploy sample Falco configuration from template (optional)
+  template:
+    src: templates/falco/falco.yaml.j2  # Assume this template exists in your Ansible project's templates/ directory
+    dest: "{{ falco_config_dest }}"
+    mode: '0644'
+  notify: Restart Falco
+
+- name: Ensure Falco modern_ebpf service is enabled and started
+  systemd:
+    name: falco-modern-bpf
+    enabled: yes
+    state: started

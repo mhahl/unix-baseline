@@ -25,6 +25,9 @@ vector_config_dest: /etc/vector/vector.yaml
 vector_ingest_url: http://syslog.v4.ts.sigaint.au:9428/insert/elasticsearch/
 vector_enabled: true
 
+# Falco
+falco_config_dest: /etc/falco/falco.yaml
+
 # Supported distributions
 sigaint_soe_supported_distributions:
   - FreeBSD

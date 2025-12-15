@@ -85,7 +85,12 @@
           env:      "{{vmagent_environment | default('production')}}"
       
       scrape_configs:
-      
+        - job_name: 'falco'
+          static_configs:
+            - targets:
+                - '127.0.0.1:8765'
+          metrics_path: /metrics
+
         - job_name: 'blackbox_exporter'
           metrics_path: /probe
           params:
