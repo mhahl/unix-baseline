@@ -9,3 +9,4 @@ sudoers_path: /usr/local/etc/sudoers
 ca_cert_path: /etc/ssl/certs/freeipa-ca.crt
 
 baseline_os: "freebsd"
+syslog_server_enabled: true

@@ -9,3 +9,5 @@ sudoers_path: /etc/sudoers
 ca_cert_path: /etc/ssl/ipa-cert.pem
 
 baseline_os: "openbsd"
+
+syslog_server_enabled: true
