@@ -1,6 +1,6 @@
-# This is a minimal, functional configuration for Falco on a host (RHEL/Fedora)
-# It uses the default rules managed by falcoctl (recommended for modern installations)
-# Customizations: JSON output enabled, log to syslog, increased buffer size for high-load systems
+# Example falco.yaml.j2 template for Ansible
+# Minimal, functional configuration for Falco (modern_eBPF driver)
+# Uses default rules via falcoctl
 
 json_output: true
 json_include_output_property: true
@@ -10,42 +10,33 @@ log_stderr: true
 log_syslog: true
 log_level: info
 
-# Rules files - rely on falcoctl-managed defaults
-# The package installs and falcoctl handles /etc/falco/falco_rules.yaml etc.
 rules_files:
   - /etc/falco/falco_rules.yaml
-  - /etc/falco/falco_rules.local.yaml   # For your custom rules/overrides
-  - /etc/falco/rules.d                  # Directory for additional custom rules files
+  - /etc/falco/falco_rules.local.yaml   # For custom rules/overrides
+  - /etc/falco/rules.d                  # Directory for additional custom rules
 
 watch_config_files: true
 
-# Buffer size for system calls (increase if you see dropped events)
-buffered_outputs: true
-syscall_event_buffer_size: 67108864   # 64MB (default is smaller on some setups)
+# modern_eBPF specific tuning
+engine:
+  kind: modern_ebpf
+
+modern_ebpf:
+  # Buffer size preset (index): higher = larger buffers, fewer drops on busy systems
+  # Default is around 4 (8MB per buffer). Try 5-7 for high-load; monitor drops
+  buf_size_preset: 6
+  # Optional: CPUs per buffer (default 2; higher = fewer but larger buffers)
+  # cpus_for_each_buffer: 4
 
 # Output configuration
-priority: debug                       # Minimum priority to output (adjust to warning/info in prod)
+priority: debug
 output_timeout: 2000
 
-# Example: Forward alerts to stdout in JSON (useful with Vector or other log shippers)
-# You can add more outputs like file, syslog, or program
+# Metrics for Prometheus (enable if desired)
+webserver:
+  enabled: true
+  listen_port: 8765
 
-# HTTP output example (if you want to send to a webhook)
-# http_output:
-#   enabled: true
-#   url: http://your-webhook-endpoint
-
-# Program output example (pipe to another tool)
-# program_output:
-#   enabled: true
-#   keep_alive: true
-#   program: "jq '{time: .time, priority: .priority, rule: .rule, output: .output}'"
-
-# Metrics (optional, for Prometheus)
 metrics:
   enabled: true
-  # output_rule: true
-
-# gRPC output (optional)
-# grpc_output:
-#   enabled: false
+  prometheus_metrics_enabled: true
