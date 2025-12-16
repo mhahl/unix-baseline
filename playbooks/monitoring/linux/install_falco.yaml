@@ -1,3 +1,4 @@
+---
 - name: Import Falco GPG key
   rpm_key:
     key: https://falco.org/repo/falcosecurity-packages.asc
@@ -23,10 +24,24 @@
     FALCO_FRONTEND: noninteractive
     FALCO_DRIVER_CHOICE: modern_ebpf
 
-- name: Deploy sample Falco configuration from template (optional)
+- name: Install falcoctl
+  dnf:
+    name: falcoctl
+    state: latest
+
+- name: Download additional rules files
+  get_url:
+    url: "{{ item.value.url }}"
+    dest: "{{ item.value.dest }}"
+    mode: '0644'
+  loop: "{{  }}"
+  register: additional_rules_downloaded
+  notify: Restart Falco
+
+- name: Deploy Falco configuration with all desired rules files
   template:
-    src: templates/falco/falco.yaml.j2  # Assume this template exists in your Ansible project's templates/ directory
-    dest: "{{ falco_config_dest }}"
+    src: templates/falco/falco.yaml.j2
+    dest: /etc/falco/falco.yaml
     mode: '0644'
   notify: Restart Falco
 

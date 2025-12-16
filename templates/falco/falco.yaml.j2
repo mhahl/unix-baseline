@@ -6,8 +6,6 @@ log_stderr: true
 log_syslog: true
 log_level: info
 
-# Explicitly enable stdout output (required in recent Falco versions to avoid "No output configured" error)
-# This sends alerts to standard output (visible in journalctl and console)
 stdout_output:
   enabled: true
 
@@ -18,26 +16,23 @@ plugins:
     init_config: ""
     open_params: ""
 
-load_plugins:
-  - container
-
 # Rules files (default + custom directory)
 rules_files:
   - /etc/falco/falco_rules.yaml
   - /etc/falco/falco_rules.local.yaml
   - /etc/falco/rules.d
+{% for file in falco_additional_rules %}
+  - {{ file.dest }}
+{% endfor %}
 
 watch_config_files: true
-
-# Engine configuration (modern_eBPF is default)
 engine:
   kind: modern_ebpf
 
   modern_ebpf:
     buf_size_preset: 6   # Increase if you see dropped events in logs/metrics
 
-# Basic output throttling (optional – adjust if needed)
-priority: debug               # Minimum priority for alerts (change to warning/info in production)
+priority: info
 output_timeout: 2000
 
 # Prometheus metrics exposure
