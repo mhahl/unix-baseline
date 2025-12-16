@@ -29,7 +29,7 @@
     url: "{{ item.value.url }}"
     dest: "{{ item.value.dest }}"
     mode: '0644'
-  loop: "{{ additional_rules_downloaded }}"
+  loop: "{{ falco_additional_rules }}"
   register: additional_rules_downloaded
   notify: Restart Falco
 
