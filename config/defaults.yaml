@@ -47,10 +47,10 @@ syslog_server_enabled: false
 
 # DNS servers for systemd-resolved (with DNS over TLS)
 systemd_resolved_dns:
-  - "76.76.2.109#xldfopbe6w.dns.controld.com"
-  - "76.76.10.109#xldfopbe6w.dns.controld.com"
-  - "2606:1a40:0:c:1efd:b67c:6598:0#xldfopbe6w.dns.controld.com"
-  - "2606:1a40:1:c:1efd:b67c:6598:0#xldfopbe6w.dns.controld.com"
+  - "76.76.2.22#xldfopbe6w.dns.controld.com"
+  - "76.76.10.22#xldfopbe6w.dns.controld.com"
+  - "2606:1a40::22#xldfopbe6w.dns.controld.com"
+  - "2606:1a40:1::22#xldfopbe6w.dns.controld.com"
 
 # DNS servers for resolv.conf (mostly FreeBSD)
 resolv_conf_dns:
