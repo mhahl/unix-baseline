@@ -26,10 +26,12 @@
 
 - name: Download additional rules files
   get_url:
-    url: "{{ item.value.url }}"
-    dest: "{{ item.value.dest }}"
+    url: "{{ rule.url }}"
+    dest: "{{ rule.dest }}"
     mode: '0644'
   loop: "{{ falco_additional_rules }}"
+  loop_control:
+    loop_var: "rule"
   register: additional_rules_downloaded
   notify: Restart Falco
 
