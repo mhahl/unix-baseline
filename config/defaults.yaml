@@ -34,7 +34,6 @@ sigaint_soe_supported_distributions:
 # DNS search domains
 dns_search:
   - sigaint.au
-  - ts.sigaint.au
 
 # System settings
 timezone: "Australia/Sydney"
@@ -47,17 +46,17 @@ syslog_server_enabled: false
 
 # DNS servers for systemd-resolved (with DNS over TLS)
 systemd_resolved_dns:
-  - "45.90.28.0#2ab561.dns.nextdns.io"
-  - "2a07:a8c0::#2ab561.dns.nextdns.io"
-  - "2a07:a8c1::#2ab561.dns.nextdns.io"
-  - "2a07:a8c1::#2ab561.dns.nextdns.io"
+  - "76.76.2.109#xldfopbe6w.dns.controld.com"
+  - "76.76.10.109#xldfopbe6w.dns.controld.com"
+  - "2606:1a40:0:c:1efd:b67c:6598:0#xldfopbe6w.dns.controld.com"
+  - "2606:1a40:1:c:1efd:b67c:6598:0#xldfopbe6w.dns.controld.com"
 
 # DNS servers for resolv.conf (mostly FreeBSD)
 resolv_conf_dns:
-  - 45.90.28.189
-  - 45.90.30.189
-  - 2a07:a8c0::2a:b561
-  - 2a07:a8c1::2a:b561
+  - 76.76.2.109
+  - 76.76.10.109
+  - 2606:1a40:0:c:1efd:b67c:6598:0
+  - 2606:1a40:1:c:1efd:b67c:6598:0
 
 # NTP servers
 ntp_servers:
