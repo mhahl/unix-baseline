@@ -9,6 +9,9 @@ log_level: info
 stdout_output:
   enabled: true
 
+syslog_output:
+  enabled: true
+
 # Load the container plugin (required for many default rules)
 plugins:
   - name: container
@@ -32,7 +35,7 @@ engine:
   modern_ebpf:
     buf_size_preset: 6   # Increase if you see dropped events in logs/metrics
 
-priority: info
+priority: warning
 output_timeout: 2000
 
 # Prometheus metrics exposure
