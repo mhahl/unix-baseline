@@ -24,11 +24,6 @@
     FALCO_FRONTEND: noninteractive
     FALCO_DRIVER_CHOICE: modern_ebpf
 
-- name: Install falcoctl
-  dnf:
-    name: falcoctl
-    state: latest
-
 - name: Download additional rules files
   get_url:
     url: "{{ item.value.url }}"
