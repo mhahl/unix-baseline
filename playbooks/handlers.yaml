@@ -119,3 +119,10 @@
     state: restarted
   listen: "restart vector"
   when: baseline_os | lower == 'linux'
+
+- name: Restart Falco
+  systemd:
+    name: falco-modern-bpf
+    state: restarted
+  listen: "restart falco"
+  when: baseline_os | lower == 'linux'
