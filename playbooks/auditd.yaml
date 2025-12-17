@@ -4,7 +4,6 @@
     name:
       - audispd-plugins
       - audit  # recommended to ensure the base package is present
-  notify: restart auditd
   when: baseline_os | lower == 'linux'
   tags:
     - baseline:auditd
