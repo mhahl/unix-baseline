@@ -1,8 +1,6 @@
 ---
 - name: Import Falco GPG key using rpm
   ansible.builtin.command: rpm --import https://falco.org/repo/falcosecurity-packages.asc
-  args:
-    creates: /etc/pki/rpm-gpg/RPM-GPG-KEY-falcosecurity
   changed_when: false
 
 - name: Add Falco YUM repository
@@ -11,7 +9,6 @@
     dest: /etc/yum.repos.d/falcosecurity.repo
     mode: '0644'
   register: repo_added
-
 
 - name: Refresh package cache if repo added
   dnf:
