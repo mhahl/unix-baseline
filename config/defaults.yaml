@@ -32,6 +32,10 @@ falco_additional_rules:
  - { url: 'https://raw.githubusercontent.com/falcosecurity/rules/main/rules/falco-incubating_rules.yaml', dest: '/etc/falco/falco-incubating_rules.yaml' }
  - { url: 'https://raw.githubusercontent.com/falcosecurity/rules/main/rules/falco-sandbox_rules.yaml',    dest: '/etc/falco/falco-sandbox_rules.yaml' }
 
+# Tailscale
+tailscale_authkey: "" # Set in secrets
+tailscale_up_extra_flags: "--accept-dns=false"
+
 # Supported distributions
 sigaint_soe_supported_distributions:
   - FreeBSD
