@@ -1,9 +1,10 @@
 ---
-- name: Import Falco GPG key
-  rpm_key:
-    key: https://falco.org/repo/falcosecurity-packages.asc
-    state: present
-  ignore_errors: true
+- name: Import Falco GPG key using rpm
+  ansible.builtin.command: rpm --import https://falco.org/repo/falcosecurity-packages.asc
+  args:
+    creates: /etc/pki/rpm-gpg/RPM-GPG-KEY-falcosecurity
+  become: true
+  changed_when: true
 
 - name: Refresh package cache if repo added
   dnf:
