@@ -20,10 +20,17 @@
       rhel/{{ ansible_facts['distribution_major_version'] }}
       {% endif %}
 
-- name: Add Tailscale repository
-  command: dnf config-manager --add-repo https://pkgs.tailscale.com/stable/{{ tailscale_repo_dir }}/tailscale.repo
-  args:
-    creates: /etc/yum.repos.d/tailscale.repo
+- name: Add Tailscale YUM repository
+  get_url:
+    url:  https://pkgs.tailscale.com/stable/{{ tailscale_repo_dir }}/tailscale.repo
+    dest: /etc/yum.repos.d/tailscale.repo
+    mode: '0644'
+  register: repo_added
+
+- name: Refresh package cache if repo added
+  dnf:
+    update_cache: yes
+  when: repo_added.changed
 
 - name: Install Tailscale package
   dnf:
