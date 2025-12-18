@@ -34,7 +34,7 @@ falco_additional_rules:
 
 # Tailscale
 tailscale_authkey: "" # Set in secrets
-tailscale_up_extra_flags: "--accept-dns=false --accept-routes=false"
+tailscale_up_extra_flags: "--login-server=https://tailscale.sigaint.au --accept-dns=false --accept-routes=false"
 
 # Supported distributions
 sigaint_soe_supported_distributions:
