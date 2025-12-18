@@ -14,11 +14,11 @@
 - name: Determine correct repo path (fedora vs rhel)
   set_fact:
     tailscale_repo_dir: >-
-      {% if ansible_facts['distribution'] == 'Fedora' -%}
+      {%- if ansible_facts['distribution'] == 'Fedora' -%}
       fedora
-      {% else -%}
+      {%- else -%}
       rhel/{{ansible_facts['distribution_major_version']}}
-      {% endif -%}
+      {% -endif -%}
 
 - name: Add Tailscale YUM repository
   get_url:
