@@ -1,0 +1,77 @@
+---
+- name: Fail if tailscale_authkey is not set
+  debug:
+    msg: "You must set the 'tailscale_authkey' variable to a valid Tailscale pre-authentication key."
+  when: tailscale_authkey == ""
+
+- name: Install dnf-plugins-core
+  dnf:
+    name: dnf-plugins-core
+    state: present
+
+
+
+- name: Determine correct repo path (fedora vs rhel)
+  set_fact:
+    tailscale_repo_dir: >-
+      {%- if ansible_facts['distribution'] == 'Fedora' -%}
+      fedora
+      {%- else -%}
+      rhel/{{ansible_facts['distribution_major_version']}}
+      {%- endif -%}
+
+- name: Add Tailscale YUM repository
+  get_url:
+    url:  https://pkgs.tailscale.com/stable/{{ tailscale_repo_dir }}/tailscale.repo
+    dest: /etc/yum.repos.d/tailscale.repo
+    mode: '0644'
+  register: repo_added
+
+- name: Refresh package cache if repo added
+  dnf:
+    update_cache: yes
+  when: repo_added.changed
+
+- name: Install Tailscale package
+  dnf:
+    name: tailscale
+    state: present
+
+- name: Enable and start tailscaled service
+  systemd:
+    name: tailscaled
+    enabled: true
+    state: started
+
+- name: Check current Tailscale backend state
+  command: tailscale status --json
+  register: ts_status
+  changed_when: false
+  ignore_errors: true  # In case tailscale CLI fails (e.g., very early install)
+
+- name: Set fact if Tailscale is already authenticated and running
+  set_fact:
+    ts_already_up: >-
+      {{ ts_status.stdout is defined
+         and (ts_status.stdout | from_json).BackendState == 'Running' }}
+
+- name: Authenticate and bring up Tailscale with preauth key if not already running
+  command: >-
+    tailscale up --auth-key={{ tailscale_authkey }}
+    {{ tailscale_up_extra_flags }}
+  when: not ts_already_up
+  environment:
+    # Helps prevent leaking the key in logs/process lists
+    TAILSCALE_AUTHKEY: "{{ tailscale_authkey }}"
+
+- name: Display final status
+  debug:
+    msg: |
+      Tailscale installation complete.
+      {% if ts_already_up %}
+      Node was already authenticated and running – no changes made.
+      {% else %}
+      Node has been authenticated using the provided preauth key.
+      {% endif %}
+      Current status: {{ (ts_status.stdout | from_json | default({'BackendState': 'Unknown'}))['BackendState'] }}
+      To verify: run 'tailscale status' on the host
