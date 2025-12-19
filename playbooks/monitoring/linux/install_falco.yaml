@@ -50,7 +50,7 @@
     mode: "0640"
   loop:
     - { src: freeipa_rules.yaml }
-    - { src: podman.yaml }
+    - { src: podman_rules.yaml }
     - { src: systemd_rules.yaml }
 
 
