@@ -1,0 +1,19 @@
+- rule: Read sensitive file untrusted
+  exceptions:
+    - name: systemd_executor_pam_read
+      fields: [proc.exe, fd.name]
+      comps: [=, startswith]
+      values:
+        - ["/usr/lib/systemd/systemd-executor", "/etc/pam.d/"]
+  override:
+    exceptions: append
+
+- rule: Read sensitive file untrusted
+  exceptions:
+    - name: systemd_userwork_shadow
+      fields: [proc.exe, fd.name]
+      comps: [=, =]
+      values:
+        - ["/usr/lib/systemd/systemd-userwork", "/etc/shadow"]
+  override:
+    exceptions: append

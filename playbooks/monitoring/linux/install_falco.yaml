@@ -41,6 +41,19 @@
     mode: '0644'
   notify: Restart Falco
 
+- name: Deploy custom falco rules
+  ansible.builtin.template:
+    src: "templates/falco/rules.d/{{ item.src }}"
+    dest: "/etc/falco/rules.d/{{ item.dest | default(item.src) }}"
+    owner: root
+    group: root
+    mode: "0640"
+  loop:
+    - { src: freeipa_rules.yaml }
+    - { src: podman.yaml }
+    - { src: systemd_rules.yaml }
+
+
 - name: Ensure Falco modern_ebpf service is enabled and started
   systemd:
     name: falco-modern-bpf
