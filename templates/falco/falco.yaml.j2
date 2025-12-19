@@ -21,12 +21,13 @@ plugins:
 
 # Rules files (default + custom directory)
 rules_files:
-  - /etc/falco/falco_rules.yaml
-  - /etc/falco/falco_rules.local.yaml
-  - /etc/falco/rules.d
 {% for file in falco_additional_rules %}
   - {{ file.dest }}
 {% endfor %}
+  - /etc/falco/falco_rules.yaml
+  - /etc/falco/falco_rules.local.yaml
+  - /etc/falco/rules.d
+
 
 watch_config_files: true
 engine:
