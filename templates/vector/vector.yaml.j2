@@ -27,7 +27,10 @@ sources:
       # For FreeIPA Dirsrv
       - /var/log/dirsrv/*/access
       - /var/log/dirsrv/*/errors
-      - /var/log/dirsrv/*/errors
+      - /var/log/dirsrv/*/security
+
+      # For tlog-rec
+      - /var/log/tlog-rec-session.log
     exclude:
       - /var/log/journal/**/*
       - /var/log/lastlog

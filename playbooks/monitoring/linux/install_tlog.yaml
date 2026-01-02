@@ -1,0 +1,42 @@
+---
+- name: Install required packages
+  package:
+    name:
+      - tlog
+      - sssd
+    state: present
+
+- name: Ensure /etc/tlog directory exists
+  file:
+    path: /etc/tlog
+    state: directory
+    mode: '0755'
+
+# If this file doesnt exist users cannot log into the system
+- name: Ensure /var/log/tlog-rec-session.log file exists
+  file:
+    path: /var/log/tlog-rec-session.log
+    state: file
+    owner: tlog
+    group: root
+    mode: '0640'
+
+- name: Deploy application configuration
+  ansible.builtin.template:
+    src: "../templates/{{ item.template }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  notify: "restart sssd"
+  with_items:
+    - { template: "tlog/tlog-rec-session.conf.j2", dest: /etc/tlog/tlog-rec-session.conf, mode: "0644" }
+    - { template: "tlog/tlog-logrotate.j2", dest: /etc/logrotate.d/tlog, mode: "0644" }
+
+- name: Configure SSSD for session recording
+  blockinfile:
+    path: /etc/sssd/conf.d/session-recording.conf
+    create: true
+    block: |
+      [session_recording]
+      scope = all
+    mode: '0600'
+  notify: "restart sssd"
