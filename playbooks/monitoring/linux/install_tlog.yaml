@@ -1,0 +1,32 @@
+---
+- name: Install required packages
+  package:
+    name:
+      - tlog
+      - sssd
+    state: present
+
+- name: Ensure /etc/tlog directory exists
+  file:
+    path: /etc/tlog
+    state: directory
+    mode: '0755'
+
+- name: Configure tlog-rec-session to use journald as writer
+  ansible.builtin.template:
+    src: "../templates/{{ item.template }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  notify: Restart sssd
+  with_items:
+    - { template: "tlog/tlog-rec-session.conf.j2", dest: /etc/tlog-rec-session.conf, mode: "0644" }
+
+- name: Configure SSSD for session recording
+  blockinfile:
+    path: /etc/sssd/conf.d/session-recording.conf
+    create: true
+    block: |
+      [session_recording]
+      scope = all
+    mode: '0600'
+  notify: Restart sssd

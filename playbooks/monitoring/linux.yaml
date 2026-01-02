@@ -15,5 +15,8 @@
 - name: Install and configure falco
   ansible.builtin.include_tasks: linux/install_falco.yaml
 
+- name: Install and configure tlog
+  ansible.builtin.include_tasks: linux/install_tlog.yaml
+
 - name: Install and configure tailscale
   ansible.builtin.include_tasks: linux/install_tailscale.yaml
