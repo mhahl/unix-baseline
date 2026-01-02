@@ -1,0 +1,13 @@
+/var/log/tlog/*.json {
+  weekly
+  rotate 12
+  compress
+  delaycompress
+  missingok
+  notifempty
+  create 0640 root tlog
+  sharedscripts
+  postrotate
+      # No need to signal anything - each file is a complete session
+  endscript
+}
