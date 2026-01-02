@@ -17,7 +17,7 @@
     src: "../templates/{{ item.template }}"
     dest: "{{ item.dest }}"
     mode: "{{ item.mode }}"
-  notify: Restart sssd
+  notify: "restart sssd"
   with_items:
     - { template: "tlog/tlog-rec-session.conf.j2", dest: /etc/tlog-rec-session.conf, mode: "0644" }
 
@@ -29,4 +29,4 @@
       [session_recording]
       scope = all
     mode: '0600'
-  notify: Restart sssd
+  notify: "restart sssd"
