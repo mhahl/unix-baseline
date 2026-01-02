@@ -1,18 +1,14 @@
 {
-    "shell": "/bin/bash",  // Change if default shell is different
-    "notice": "\n It is a criminal offence for unauthorised persons or devices to connect to this system.
-
-. \n\n",
+    "shell": "/bin/bash",
+    "notice": "\n****\nThis session is being recorded.\n****\n\n",
 
     "log": {
-      "input": false,
+      "input": true,
       "output": true,
       "window": true
     },
-
-    "writer": "journal",
-    "journal": {
-      "priority": "info",
-      "augment": true
+    "writer": "file",
+    "file": {
+      "path": "/var/log/tlog/{{ ansible_facts['hostname'] }}-%i.json"
     }
 }

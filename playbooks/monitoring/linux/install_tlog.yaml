@@ -12,7 +12,7 @@
     state: directory
     mode: '0755'
 
-- name: Configure tlog-rec-session to use journald as writer
+- name: Deploy application configuration
   ansible.builtin.template:
     src: "../templates/{{ item.template }}"
     dest: "{{ item.dest }}"
@@ -20,6 +20,7 @@
   notify: "restart sssd"
   with_items:
     - { template: "tlog/tlog-rec-session.conf.j2", dest: /etc/tlog-rec-session.conf, mode: "0644" }
+    - { template: "tlog/tlog-logrotate.j2", dest: /etc/logrotate.d/tlog, mode: "0644" }
 
 - name: Configure SSSD for session recording
   blockinfile:
