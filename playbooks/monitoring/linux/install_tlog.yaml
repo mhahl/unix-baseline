@@ -16,7 +16,9 @@
 - name: Ensure /var/log/tlog-rec-session.log file exists
   file:
     path: /var/log/tlog-rec-session.log
-    state: present
+    state: file
+    owner: tlog
+    group: root
     mode: '0640'
 
 - name: Deploy application configuration
