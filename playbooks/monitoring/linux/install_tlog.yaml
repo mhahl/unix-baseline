@@ -16,10 +16,12 @@
 - name: Ensure /var/log/tlog-rec-session.log file exists
   file:
     path: /var/log/tlog-rec-session.log
-    state: file
+    state: touch
     owner: tlog
     group: root
     mode: '0640'
+    access_time: preserve
+    modification_time: preserve
 
 - name: Deploy application configuration
   ansible.builtin.template:
