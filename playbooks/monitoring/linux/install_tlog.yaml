@@ -12,6 +12,13 @@
     state: directory
     mode: '0755'
 
+# If this file doesnt exist users cannot log into the system
+- name: Ensure /var/log/tlog-rec-session.log file exists
+  file:
+    path: /var/log/tlog-rec-session.log
+    state: present
+    mode: '0640'
+
 - name: Deploy application configuration
   ansible.builtin.template:
     src: "../templates/{{ item.template }}"
