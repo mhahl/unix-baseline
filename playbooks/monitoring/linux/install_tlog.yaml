@@ -19,7 +19,7 @@
     mode: "{{ item.mode }}"
   notify: "restart sssd"
   with_items:
-    - { template: "tlog/tlog-rec-session.conf.j2", dest: /etc/tlog-rec-session.conf, mode: "0644" }
+    - { template: "tlog/tlog-rec-session.conf.j2", dest: /etc/tlog/tlog-rec-session.conf, mode: "0644" }
     - { template: "tlog/tlog-logrotate.j2", dest: /etc/logrotate.d/tlog, mode: "0644" }
 
 - name: Configure SSSD for session recording
