@@ -7,6 +7,13 @@
       - clamd
     state: present
 
+- name: Allow ClamAV on-access scanning via SELinux boolean
+  ansible.posix.seboolean:
+    name: antivirus_can_scan_system
+    state: yes
+    persistent: yes
+  when: ansible_selinux.status == 'enabled'
+
 - name: Ensure /var/cache/clamd directory exists
   file:
     path: /var/cache/clamd
