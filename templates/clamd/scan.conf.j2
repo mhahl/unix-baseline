@@ -219,7 +219,7 @@ ExcludePath ^/sys/
 # For the same reason, you should NOT use the environment variables in the
 # command directly, but should use it carefully from your executed script.
 # Default: no
-VirusEvent /usr/local/bin/clamav-notify.sh
+VirusEvent /usr/local/bin/clamav-notify
 
 # Run as another user (clamd must be started by root for this option to work)
 # Default: don't drop privileges
@@ -725,7 +725,9 @@ OnAccessCurlTimeout 10000
 OnAccessIncludePath {{dir}}
 {%endfor%}
 
-#OnAccessIncludePath /students
+{%for dir in clamd_extra_onaccess_include_dirs | default([])  %}
+OnAccessIncludePath {{dir}}
+{%endfor%}
 
 # Set the exclude paths. All subdirectories are also excluded.
 # Default: disabled
