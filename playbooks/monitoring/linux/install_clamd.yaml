@@ -16,7 +16,7 @@
     - "restart clamd"
     - "restart clamonacc"
   with_items:
-    - { template: "clamd/scan.conf.j2", dest: /etc/clamd/scan.conf, mode: "0644" }
+    - { template: "clamd/scan.conf.j2", dest: /etc/clamd.d/scan.conf, mode: "0644" }
 
 - name: Enable and start the clamd daemon
   systemd:
