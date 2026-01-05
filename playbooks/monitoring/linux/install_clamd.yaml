@@ -30,8 +30,23 @@
   with_items:
     - { template: "clamd/scan.conf.j2", dest: /etc/clamd.d/scan.conf, mode: "0644" }
 
+- name: Enable and start the freshclam daemon
+  systemd:
+    name: clamav-freshclam.service
+    enabled: yes
+    state: started
+
 - name: Enable and start the clamd daemon
+  systemd:
+    name: clamd@scan.service
+    enabled: yes
+    state: started
+
+- name: Enable and start the clamonacc daemon
   systemd:
     name: clamonacc.service
     enabled: yes
     state: started
+
+
+#
