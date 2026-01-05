@@ -234,7 +234,7 @@ User clamscan
 
 # Enable debug messages in libclamav.
 # Default: no
-Debug yes
+Debug no
 
 # Do not remove temporary files (for debug purposes).
 # Default: no
@@ -749,7 +749,7 @@ OnAccessPrevention yes
 # created or moved.
 # Requires the  DDD system to kick-off extra scans.
 # Default: no
-OnAccessExtraScanning yes
+OnAccessExtraScanning no
 
 # Set the  mount point to be scanned. The mount point specified, or the mount
 # point containing the specified directory will be watched. If any directories
@@ -794,12 +794,12 @@ OnAccessExtraScanning yes
 # It has the same potential race condition limitations of the
 # OnAccessExcludeUID option.
 # Default: disabled
-OnAccessExcludeUname clamscan
+#OnAccessExcludeUname clamscan
 
 # Number of times the OnAccess client will retry a failed scan due to
 # connection problems (or other issues).
 # Default: 0
-OnAccessRetryAttempts 3
+OnAccessRetryAttempts 0
 
 ##
 ## Bytecode

@@ -22,7 +22,6 @@ clamd_daemon_addr: clamd.v4.ts.sigaint.au
 clamd_daemon_port: 3310
 clamd_onaccess_include_dirs:
   - /home
-  - /var/run
   - /var/tmp
   - /bin
   - /tmp
