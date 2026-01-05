@@ -20,3 +20,6 @@
 
 - name: Install and configure tailscale
   ansible.builtin.include_tasks: linux/install_tailscale.yaml
+
+- name: Install and configure clamd
+  ansible.builtin.include_tasks: linux/install_clamd.yaml

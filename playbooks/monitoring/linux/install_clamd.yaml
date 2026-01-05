@@ -1,0 +1,31 @@
+---
+
+- name: Install required ClamAV packages
+  dnf:
+    name:
+      - clamav
+      - clamd
+    state: present
+
+- name: Deploy application configuration
+  ansible.builtin.template:
+    src: "../templates/{{ item.template }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  notify:
+    - "restart clamd"
+    - "restart clamonacc"
+  with_items:
+    - { template: "clamd/scan.conf.j2", dest: /etc/clamd/scan.conf, mode: "0644" }
+
+- name: Enable and start the clamd daemon
+  systemd:
+    name: clamd@scan.service
+    enabled: yes
+    state: started
+
+- name: Enable and start the clamd daemon
+  systemd:
+    name: clamonacc.service
+    enabled: yes
+    state: started

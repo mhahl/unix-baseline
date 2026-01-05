@@ -126,3 +126,17 @@
     state: restarted
   listen: "restart falco"
   when: baseline_os | lower == 'linux'
+
+- name: Restart Clamd
+  systemd:
+    name: clamd
+    state: restarted
+  listen: "restart clamonacc"
+  when: baseline_os | lower == 'linux'
+
+- name: Restart Clamonacc
+  systemd:
+    name: clamonacc
+    state: restarted
+  listen: "restart clamd"
+  when: baseline_os | lower == 'linux'

@@ -14,6 +14,16 @@ vmagent_environment: "production"
 # Node exporter
 node_exporter_version: "latest"
 
+# Clamav
+clamd_daemon_addr: clamd.v4.ts.sigaint.au
+clamd_daemon_port: 3310
+clamd_onaccess_include_dirs:
+  - /home
+  - /var/run
+  - /var/tmp
+  - /bin
+  - /tmp
+
 # Blackbox exporter
 blackbox_version: "latest"
 blackbox_exporter_listen_port: 9115
