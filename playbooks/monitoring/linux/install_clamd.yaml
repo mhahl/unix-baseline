@@ -27,8 +27,10 @@
     mode: "{{ item.mode }}"
   notify:
     - "restart clamonacc"
+    - "restart clamd"
   with_items:
     - { template: "clamd/scan.conf.j2", dest: /etc/clamd.d/scan.conf, mode: "0644" }
+    - { template: "clamd/clamav-notify.sh.j2", dest: /usr/local/bin/clamav-notify, mode: "0755" }
 
 - name: Enable and start the freshclam daemon
   systemd:

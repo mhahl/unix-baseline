@@ -14,6 +14,9 @@ vmagent_environment: "production"
 # Node exporter
 node_exporter_version: "latest"
 
+# Alertmanager
+alertmanager_url: https://alertmanager.sigaint.au
+
 # Clamav
 clamd_daemon_addr: clamd.v4.ts.sigaint.au
 clamd_daemon_port: 3310

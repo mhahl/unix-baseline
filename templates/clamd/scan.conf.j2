@@ -219,7 +219,7 @@ ExcludePath ^/sys/
 # For the same reason, you should NOT use the environment variables in the
 # command directly, but should use it carefully from your executed script.
 # Default: no
-#VirusEvent /opt/send_virus_alert_sms.sh
+VirusEvent /usr/local/bin/clamav-notify.sh
 
 # Run as another user (clamd must be started by root for this option to work)
 # Default: don't drop privileges
