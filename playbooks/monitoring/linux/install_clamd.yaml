@@ -19,16 +19,9 @@
     dest: "{{ item.dest }}"
     mode: "{{ item.mode }}"
   notify:
-    - "restart clamd"
     - "restart clamonacc"
   with_items:
     - { template: "clamd/scan.conf.j2", dest: /etc/clamd.d/scan.conf, mode: "0644" }
-
-- name: Enable and start the clamd daemon
-  systemd:
-    name: clamd@scan.service
-    enabled: yes
-    state: started
 
 - name: Enable and start the clamd daemon
   systemd:
