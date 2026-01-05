@@ -7,12 +7,12 @@
       - clamd
     state: present
 
-- name: Allow ClamAV on-access scanning via SELinux boolean
-  seboolean:
-    name: antivirus_can_scan_system
-    state: yes
-    persistent: yes
-  when: ansible_selinux.status == 'enabled'
+- name: Allow ClamAV on-access scanning via SELinux boolean (using setsebool)
+  command: setsebool -P antivirus_can_scan_system on
+  args:
+    creates: /sys/fs/selinux/booleans/antivirus_can_scan_system
+  changed_when: true
+  when: ansible_selinux.status == 'enabled' and ansible_selinux.mode == 'enforcing'
 
 - name: Ensure /var/cache/clamd directory exists
   file:
