@@ -131,7 +131,7 @@
   systemd:
     name: clamd
     state: restarted
-  listen: "restart clamd"
+  listen: "restart clamd@scan"
   when: baseline_os | lower == 'linux'
 
 - name: Restart Clamonacc
