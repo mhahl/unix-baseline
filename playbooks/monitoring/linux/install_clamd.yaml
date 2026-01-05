@@ -8,7 +8,7 @@
     state: present
 
 - name: Allow ClamAV on-access scanning via SELinux boolean
-  ansible.posix.seboolean:
+  seboolean:
     name: antivirus_can_scan_system
     state: yes
     persistent: yes
