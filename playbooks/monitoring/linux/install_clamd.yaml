@@ -1,0 +1,53 @@
+---
+
+- name: Install required ClamAV packages
+  dnf:
+    name:
+      - clamav
+      - clamd
+    state: present
+
+- name: Allow ClamAV on-access scanning via SELinux boolean (using setsebool)
+  command: setsebool -P antivirus_can_scan_system on
+  args:
+    creates: /sys/fs/selinux/booleans/antivirus_can_scan_system
+  changed_when: true
+  when: ansible_selinux.status == 'enabled' and ansible_selinux.mode == 'enforcing'
+
+- name: Ensure /var/cache/clamd directory exists
+  file:
+    path: /var/cache/clamd
+    state: directory
+    mode: '0750'
+
+- name: Deploy application configuration
+  ansible.builtin.template:
+    src: "../templates/{{ item.template }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  notify:
+    - "restart clamonacc"
+  with_items:
+    - { template: "clamd/scan.conf.j2", dest: /etc/clamd.d/scan.conf, mode: "0644" }
+    - { template: "clamd/clamav-notify.sh.j2", dest: /usr/local/bin/clamav-notify, mode: "0755" }
+
+- name: Enable and start the freshclam daemon
+  systemd:
+    name: clamav-freshclam.service
+    enabled: no
+    state: stopped
+
+- name: Enable and start the clamd daemon
+  systemd:
+    name: clamd@scan.service
+    enabled: no
+    state: stopped
+
+- name: Enable and start the clamonacc daemon
+  systemd:
+    name: clamonacc.service
+    enabled: yes
+    state: started
+
+
+#
