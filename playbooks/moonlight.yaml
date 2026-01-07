@@ -1,6 +1,7 @@
 ---
 - name: "moonlight checkin"
   failed_when: false
+  when: false
   tags:
     - moonlight
   ansible.builtin.uri:
