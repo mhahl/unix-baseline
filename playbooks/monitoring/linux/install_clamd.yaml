@@ -17,6 +17,7 @@
   file:
     path: /etc/systemd/system/clamd@.service.d/capabilities.conf
     state: absent
+  notify: "daemon reload"
 
 - name: Ensure /var/cache/clamd directory exists
   file:
