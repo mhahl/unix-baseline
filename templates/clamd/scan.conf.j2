@@ -176,6 +176,8 @@ TCPAddr {{clamd_daemon_addr}}
 # Default: scan all
 ExcludePath ^/proc/
 ExcludePath ^/sys/
+ExcludePath ^/tmp/ansible
+ExcludePath ^/tmp/gpg
 
 # Maximum depth directories are scanned at.
 # Default: 15
@@ -737,7 +739,7 @@ OnAccessIncludePath {{dir}}
 # If off, fanotify will only notify if the file scanned is a virus,
 # and not perform any blocking.
 # Default: no
-OnAccessPrevention yes
+OnAccessPrevention no
 
 # When using prevention, if this option is turned on, any errors that occur
 # during scanning will result in the event attempt being denied. This could
