@@ -20,7 +20,7 @@ LogFileUnlock yes
 # in bytes just don't use modifiers. If LogFileMaxSize is enabled, log
 # rotation (the LogRotate option) will always be enabled.
 # Default: 1M
-LogFileMaxSize 5M
+LogFileMaxSize 10M
 
 # Log time with each message.
 # Default: no
@@ -29,7 +29,7 @@ LogTime yes
 # Also log clean files. Useful in debugging but drastically increases the
 # log size.
 # Default: no
-LogClean yes
+LogClean no
 
 # Use system logger (can work together with LogFile).
 # Default: no
@@ -99,7 +99,7 @@ LocalSocket /run/clamd.scan/clamd.sock
 
 # Sets the permissions on the unix socket to the specified mode.
 # Default: disabled (socket is world accessible)
-#LocalSocketMode 660
+LocalSocketMode 660
 
 # Remove stale socket after unclean shutdown.
 # Default: yes
@@ -176,8 +176,6 @@ FixStaleSocket yes
 # Default: scan all
 ExcludePath ^/proc/
 ExcludePath ^/sys/
-ExcludePath ^/tmp/ansible
-ExcludePath ^/tmp/gpg
 
 # Maximum depth directories are scanned at.
 # Default: 15
@@ -185,12 +183,11 @@ ExcludePath ^/tmp/gpg
 
 # Follow directory symlinks.
 # Default: no
-#FollowDirectorySymlinks yes
+FollowDirectorySymlinks yes
 
 # Follow regular file symlinks.
 # Default: no
-#FollowFileSymlinks yes
-
+FollowFileSymlinks yes
 
 # Scan files and directories on other filesystems.
 # Default: yes
@@ -225,7 +222,7 @@ VirusEvent /usr/local/bin/clamav-notify
 
 # Run as another user (clamd must be started by root for this option to work)
 # Default: don't drop privileges
-User clamscan
+#User clamscan
 
 # Stop daemon when libclamav reports out of memory condition.
 #ExitOnOOM yes
@@ -776,7 +773,7 @@ OnAccessExtraScanning no
 # OnAccessExcludeRootUID is not *guaranteed* to prevent every access by the
 # root user from triggering a scan (unless OnAccessPrevention is enabled).
 # Default: no
-#OnAccessExcludeRootUID no
+OnAccessExcludeRootUID yes
 
 # With this option you can exclude specific UIDs. Processes with these UIDs
 # will be able to access all files without triggering scans or permission
@@ -798,12 +795,12 @@ OnAccessExtraScanning no
 # It has the same potential race condition limitations of the
 # OnAccessExcludeUID option.
 # Default: disabled
-OnAccessExcludeUname clamscan
+#OnAccessExcludeUname clamscan
 
 # Number of times the OnAccess client will retry a failed scan due to
 # connection problems (or other issues).
 # Default: 0
-OnAccessRetryAttempts 0
+OnAccessRetryAttempts 2
 
 ##
 ## Bytecode
