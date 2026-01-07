@@ -7,25 +7,6 @@
       - clamd
     state: present
 
-- name: Create systemd drop-in directory for clamd
-  ansible.builtin.file:
-    path: /etc/systemd/system/clamd@.service.d
-    state: directory
-    mode: '0755'
-
-- name: Deploy systemd override drop-in for clamd capabilities
-  ansible.builtin.copy:
-    dest: /etc/systemd/system/clamd@.service.d/capabilities.conf
-    content: |
-      [Service]
-      AmbientCapabilities=CAP_DAC_READ_SEARCH
-      CapabilityBoundingSet=CAP_DAC_READ_SEARCH
-    mode: '0644'
-  notify:
-    - daemon reload
-    - restart clamonacc
-    - restart clamd
-
 - name: Allow ClamAV on-access scanning via SELinux boolean
   command: setsebool -P antivirus_can_scan_system on
   args:
