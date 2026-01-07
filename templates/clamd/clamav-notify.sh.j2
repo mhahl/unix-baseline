@@ -1,2 +1,3 @@
 #!/bin/bash
-logger -t clamav-virus-event "{ \"Virus\":  \"${CLAM_VIRUSEVENT_VIRUSNAME}\", \"file\": \"${CLAM_VIRUSEVENT_FILENAME}\""
+echo "{ \"event\": \"clamav-notify\", \"virus\":  \"${CLAM_VIRUSEVENT_VIRUSNAME}\", \"file\": \"${CLAM_VIRUSEVENT_FILENAME}\"" | systemd-cat -p emerg
+
