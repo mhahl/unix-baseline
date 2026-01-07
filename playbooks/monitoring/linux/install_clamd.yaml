@@ -34,14 +34,14 @@
 - name: Enable and start the freshclam daemon
   systemd:
     name: clamav-freshclam.service
-    enabled: no
-    state: stopped
+    enabled: yes
+    state: started
 
 - name: Enable and start the clamd daemon
   systemd:
     name: clamd@scan.service
-    enabled: no
-    state: stopped
+    enabled: yes
+    state: started
 
 - name: Enable and start the clamonacc daemon
   systemd:
