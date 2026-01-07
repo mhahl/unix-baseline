@@ -1,7 +1,14 @@
 ---
-- name: Configure repos (FreeBSD only)
+- name: Configure repos (FreeBSD)
   ansible.builtin.include_tasks: repos/freebsd.yaml
   when: baseline_os | lower == 'freebsd'
   tags:
     - baseline:repos
     - baseline:repos:configure
+
+- name: Configure EPEL (RHEL)
+  ansible.builtin.include_tasks: repos/epel_rhel.yaml
+  tags:
+    - baseline:repos
+    - baseline:repos:configure
+  when: ansible_distribution == 'RedHat' and ansible_distribution_major_version in ['10', '9']

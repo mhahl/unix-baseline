@@ -1,0 +1,9 @@
+
+- name: Enable CodeReady Builder repository
+  ansible.builtin.command: subscription-manager repos --enable codeready-builder-for-rhel-{{ansible_distribution_major_version}}-{{ ansible_architecture }}-rpms
+  changed_when: true
+
+- name: Install EPEL release
+  ansible.builtin.dnf:
+    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ansible_distribution_major_version}}.noarch.rpm
+    state: present
