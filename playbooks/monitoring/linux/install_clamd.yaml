@@ -13,6 +13,11 @@
     creates: /sys/fs/selinux/booleans/antivirus_can_scan_system
   changed_when: true
 
+- name: Remove capabilities
+  file:
+    path: /etc/systemd/system/clamd@.service.d/capabilities.conf
+    state: absent
+
 - name: Ensure /var/cache/clamd directory exists
   file:
     path: /var/cache/clamd
