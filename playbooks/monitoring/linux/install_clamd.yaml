@@ -7,11 +7,25 @@
       - clamd
     state: present
 
-## This doesnt exist for some reason on some rhel9 systems
-- name: Allow ClamAV on-access scanning via SELinux boolean
-  command: setsebool -P antivirus_can_scan_system 1
+
+- name: Check if SELinux boolean 'antivirus_can_scan_system' exists
+  ansible.builtin.command: getsebool antivirus_can_scan_system
+  register: boolean_check
   changed_when: false
   failed_when: false
+  ignore_errors: true
+
+- name: Allow ClamAV on-access scanning via SELinux boolean (if boolean exists)
+  ansible.builtin.command: setsebool -P antivirus_can_scan_system 1
+  changed_when: false
+  when: boolean_check.rc == 0
+
+- name: Check if antivirus_tmp_t context is already set for /var/cache/clamd
+  ansible.builtin.command: semanage fcontext -l | grep '^/var/cache/clamd(/.*)?[[:space:]]*all files[[:space:]]*system_u:object_r:antivirus_tmp_t:s0'
+  register: fcontext_check
+  changed_when: false
+  failed_when: false
+  when: boolean_check.rc == 0
 
 - name: Remove capabilities
   file:
@@ -27,18 +41,13 @@
     group: clamscan
     mode: '0750'
 
-- name: Check if antivirus_tmp_t context is already set for /var/cache/clamd
-  command: semanage fcontext -l | grep '^/var/cache/clamd(/.*)?[[:space:]]*all files[[:space:]]*system_u:object_r:antivirus_tmp_t:s0'
-  register: fcontext_check
-  changed_when: false
-  failed_when: false
-
 - name: Add permanent SELinux file context antivirus_tmp_t to /var/cache/clamd (recursive)
   command: semanage fcontext -a -t antivirus_tmp_t '/var/cache/clamd(/.*)?'
-  when: fcontext_check.rc != 0
+  when: fcontext_check.rc != 0 and boolean_check.rc == 0
 
 - name: Apply the SELinux context to existing files/directories (restorecon)
   command: restorecon -R /var/cache/clamd
+  when: boolean_check.rc == 0
 
 - name: Deploy application configuration
   ansible.builtin.template:
