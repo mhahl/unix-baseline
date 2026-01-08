@@ -25,7 +25,6 @@
   register: fcontext_check
   changed_when: false
   failed_when: false
-  when: boolean_check.rc == 0
 
 - name: Remove capabilities
   file:
