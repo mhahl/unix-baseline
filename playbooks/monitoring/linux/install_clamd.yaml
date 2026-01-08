@@ -1,12 +1,25 @@
 ---
-
 - name: Install required ClamAV packages
-  dnf:
+  ansible.builtin.dnf:
     name:
       - clamav
       - clamd
+      - clamav-update  # Ensures freshclam is available
     state: present
 
+- name: Remove custom capabilities override (if present)
+  ansible.builtin.file:
+    path: /etc/systemd/system/clamd@.service.d/capabilities.conf
+    state: absent
+  notify: daemon-reload
+
+- name: Ensure /var/cache/clamd directory exists with correct ownership
+  ansible.builtin.file:
+    path: /var/cache/clamd
+    state: directory
+    owner: clamscan
+    group: clamscan
+    mode: '0750'
 
 - name: Check if SELinux boolean 'antivirus_can_scan_system' exists
   ansible.builtin.command: getsebool antivirus_can_scan_system
@@ -15,68 +28,58 @@
   failed_when: false
   ignore_errors: true
 
-- name: Allow ClamAV on-access scanning via SELinux boolean (if boolean exists)
-  ansible.builtin.command: setsebool -P antivirus_can_scan_system 1
+- name: Enable SELinux boolean for system-wide scanning (if available)
+  ansible.builtin.command: setsebool -P antivirus_can_scan_system on
   changed_when: false
   when: boolean_check.rc == 0
 
-- name: Check if antivirus_tmp_t context is already set for /var/cache/clamd
-  ansible.builtin.command: semanage fcontext -l | grep '^/var/cache/clamd(/.*)?[[:space:]]*all files[[:space:]]*system_u:object_r:antivirus_tmp_t:s0'
+- name: Check current SELinux file context for /var/cache/clamd
+  ansible.builtin.command: >-
+    semanage fcontext -l |
+    grep '^/var/cache/clamd(/.*)?[[:space:]]*all files[[:space:]]*system_u:object_r:antivirus_tmp_t:s0'
   register: fcontext_check
   changed_when: false
   failed_when: false
+  when: boolean_check.rc == 0  # Only relevant if antivirus policy is present
 
-- name: Remove capabilities
-  file:
-    path: /etc/systemd/system/clamd@.service.d/capabilities.conf
-    state: absent
-  notify: "daemon reload"
+- name: Add permanent SELinux file context for /var/cache/clamd (recursive)
+  ansible.builtin.command: semanage fcontext -a -t antivirus_tmp_t '/var/cache/clamd(/.*)?'
+  when:
+    - boolean_check.rc == 0
+    - fcontext_check.rc != 0
 
-- name: Ensure /var/cache/clamd directory exists
-  file:
-    path: /var/cache/clamd
-    state: directory
-    owner: clamscan
-    group: clamscan
-    mode: '0750'
-
-- name: Add permanent SELinux file context antivirus_tmp_t to /var/cache/clamd (recursive)
-  command: semanage fcontext -a -t antivirus_tmp_t '/var/cache/clamd(/.*)?'
-  when: fcontext_check.rc != 0 and boolean_check.rc == 0
-
-- name: Apply the SELinux context to existing files/directories (restorecon)
-  command: restorecon -R /var/cache/clamd
+- name: Apply correct SELinux context to /var/cache/clamd
+  ansible.builtin.command: restorecon -R -v /var/cache/clamd
   when: boolean_check.rc == 0
 
-- name: Deploy application configuration
+- name: Deploy ClamAV configuration files
   ansible.builtin.template:
     src: "../templates/{{ item.template }}"
     dest: "{{ item.dest }}"
+    owner: root
+    group: root
     mode: "{{ item.mode }}"
+  loop:
+    - { template: "clamd/scan.conf.j2", dest: "/etc/clamd.d/scan.conf", mode: "0644" }
+    - { template: "clamd/clamav-notify.sh.j2", dest: "/usr/local/bin/clamav-notify", mode: "0755" }
   notify:
-    - "restart clamonacc"
-    - "restart clamd"
-  with_items:
-    - { template: "clamd/scan.conf.j2", dest: /etc/clamd.d/scan.conf, mode: "0644" }
-    - { template: "clamd/clamav-notify.sh.j2", dest: /usr/local/bin/clamav-notify, mode: "0755" }
+    - restart clamd
+    - restart clamonacc
 
-- name: Enable and start the freshclam daemon
-  systemd:
-    name: clamav-freshclam.service
-    enabled: yes
+- name: Enable and start clamav-freshclam service
+  ansible.builtin.systemd:
+    name: clamav-freshclam
+    enabled: true
     state: started
 
-- name: Enable and start the clamd daemon
-  systemd:
-    name: clamd@scan.service
-    enabled: yes
+- name: Enable and start clamd@scan service
+  ansible.builtin.systemd:
+    name: clamd@scan
+    enabled: true
     state: started
 
-- name: Enable and start the clamonacc daemon
-  systemd:
-    name: clamonacc.service
-    enabled: yes
+- name: Enable and start clamonacc service
+  ansible.builtin.systemd:
+    name: clamonacc
+    enabled: true
     state: started
-
-
-#

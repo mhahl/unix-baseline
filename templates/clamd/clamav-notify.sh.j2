@@ -1,3 +1,3 @@
 #!/bin/bash
-echo "{ \"event\": \"clamav-notify\", \"virus\":  \"${CLAM_VIRUSEVENT_VIRUSNAME}\", \"file\": \"${CLAM_VIRUSEVENT_FILENAME}\"" | systemd-cat -p emerg
+echo "{ \"event\": \"virus-event-notify\", \"virus\":  \"${CLAM_VIRUSEVENT_VIRUSNAME}\", \"file\": \"${CLAM_VIRUSEVENT_FILENAME}\"" | systemd-cat -p emerg
 
