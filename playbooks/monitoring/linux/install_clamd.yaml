@@ -66,6 +66,18 @@
     - restart clamd
     - restart clamonacc
 
+- name: Check if ClamAV virus database files exist
+  ansible.builtin.stat:
+    path: /var/lib/clamav/daily.cvd
+  register: daily_cvd_stat
+
+- name: Run initial freshclam update if database is missing
+  ansible.builtin.command: freshclam
+  when: not daily_cvd_stat.stat.exists
+  notify:
+    - restart clamd
+    - restart clamonacc
+
 - name: Enable and start clamav-freshclam service
   ansible.builtin.systemd:
     name: clamav-freshclam
