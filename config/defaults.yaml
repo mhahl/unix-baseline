@@ -21,10 +21,10 @@ alertmanager_url: https://alertmanager.sigaint.au
 clamd_daemon_addr: clamd.v4.ts.sigaint.au
 clamd_daemon_port: 3310
 clamd_onaccess_include_dirs:
-  - /home
   - /var/tmp
   - /bin
   - /tmp
+  - /home
 
 # Blackbox exporter
 blackbox_version: "latest"
