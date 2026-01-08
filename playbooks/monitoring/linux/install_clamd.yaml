@@ -1,12 +1,18 @@
 ---
-- name: Increase inotify max_user_watches to 65536
-  sysctl:
-    name: fs.inotify.max_user_watches
-    value: '655360'
-    state: present
-    reload: yes
-    sysctl_file: /etc/sysctl.d/90-inotify-watches.conf
+- name: Create sysctl config file for inotify watches
+  ansible.builtin.copy:
+    content: |
+      # Increased inotify watchers for ClamAV on-access scanning
+      fs.inotify.max_user_watches = 655360
+    dest: /etc/sysctl.d/90-inotify-watches.conf
+    mode: '0644'
+  register: sysctl
 
+- name: Apply the sysctl parameter immediately
+  ansible.builtin.shell: |
+    sysctl -w fs.inotify.max_user_watches=655360
+  when: sysctl.changed
+  
 - name: Install required ClamAV packages
   ansible.builtin.dnf:
     name:

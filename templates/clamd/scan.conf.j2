@@ -107,7 +107,7 @@ FixStaleSocket yes
 
 # TCP port address.
 # Default: no
-#TCPSocket {{clamd_daemon_port | default(3310) }}
+#TCPSocket
 
 # TCP address.
 # By default we bind to INADDR_ANY, probably not wise.
@@ -115,7 +115,7 @@ FixStaleSocket yes
 # from the outside world. This option can be specified multiple
 # times if you want to listen on multiple IPs. IPv6 is now supported.
 # Default: no
-#TCPAddr {{clamd_daemon_addr}}
+#TCPAddr
 
 # Maximum length the queue of pending connections may grow to.
 # Default: 200
@@ -176,6 +176,14 @@ FixStaleSocket yes
 # Default: scan all
 ExcludePath ^/proc/
 ExcludePath ^/sys/
+
+{%for dir in clamd_onaccess_exclude_path | default([]) %}
+ExcludePath {{dir}}
+{%endfor%}
+
+{%for dir in clamd_extra_onaccess_exclude_path | default([])  %}
+ExcludePath {{dir}}
+{%endfor%}
 
 # Maximum depth directories are scanned at.
 # Default: 15

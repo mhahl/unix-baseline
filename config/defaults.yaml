@@ -14,17 +14,15 @@ vmagent_environment: "production"
 # Node exporter
 node_exporter_version: "latest"
 
-# Alertmanager
-alertmanager_url: https://alertmanager.sigaint.au
-
-# Clamav
-clamd_daemon_addr: clamd.v4.ts.sigaint.au
-clamd_daemon_port: 3310
 clamd_onaccess_include_dirs:
   - /var/tmp
   - /bin
   - /tmp
   - /home
+
+clamd_onaccess_exclude_path:
+  - "^/proc/"
+  - "^/sys/"
 
 # Blackbox exporter
 blackbox_version: "latest"
