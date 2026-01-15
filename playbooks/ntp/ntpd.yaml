@@ -4,7 +4,7 @@
     src: "../templates/{{ item.template }}"
     dest: "{{ item.dest }}"
     mode: "{{ item.mode }}"
-  notify: "restart ntpd"
+  notify: "restart ntp"
   tags:
     - baseline:ntp
     - baseline:ntp:configure
