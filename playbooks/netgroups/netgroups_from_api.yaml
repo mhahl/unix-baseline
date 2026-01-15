@@ -14,7 +14,7 @@
     content: "{{request.content}}"
     dest: /etc/netgroup
     mode: '0644'
-  notify: "run update /etc/netgroup"
+  notify: "rebuild netgroup"
   tags:
     - baseline:netgroups
     - baseline:netgroups:configure
