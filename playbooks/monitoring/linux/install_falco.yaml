@@ -1,6 +1,11 @@
 ---
-- name: Import Falco GPG key using rpm
+- name: Check if Falco GPG key is already imported
+  ansible.builtin.command: rpm -q gpg-pubkey --qf '%{name}-%{version}-%{release} %{summary}\n'
+  register: imported_keys
+
+- name: Import Falco GPG key (only if not present)
   ansible.builtin.command: rpm --import https://falco.org/repo/falcosecurity-packages.asc
+  when: "'cncf-falco-dev@lists.cncf.io' not in imported_keys.stdout"
   changed_when: false
 
 - name: Add Falco YUM repository

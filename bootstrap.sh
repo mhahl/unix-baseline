@@ -79,6 +79,9 @@ esac
 # Verify Ansible is installed
 command -v ansible-pull >/dev/null || die "Ansible installation failed"
 
+# Install requirements
+ansible-galaxy collection install -r requirements.yaml
+
 # -----------------------------
 # Run ansible-pull using the permanent credentials file
 # -----------------------------
