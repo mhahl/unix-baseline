@@ -174,8 +174,6 @@ FixStaleSocket yes
 # Don't scan files and directories matching regex
 # This directive can be used multiple times
 # Default: scan all
-ExcludePath ^/proc/
-ExcludePath ^/sys/
 
 {%for dir in clamd_onaccess_exclude_path | default([]) %}
 ExcludePath {{dir}}

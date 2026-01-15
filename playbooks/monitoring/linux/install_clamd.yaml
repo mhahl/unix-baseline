@@ -12,7 +12,7 @@
   ansible.builtin.shell: |
     sysctl -w fs.inotify.max_user_watches=655360
   when: sysctl.changed
-  
+
 - name: Install required ClamAV packages
   ansible.builtin.dnf:
     name:

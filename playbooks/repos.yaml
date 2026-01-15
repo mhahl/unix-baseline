@@ -1,6 +1,6 @@
 ---
 - name: Configure repos (FreeBSD)
-  ansible.builtin.include_tasks: repos/freebsd.yaml
+  ansible.builtin.include_tasks: repos/pkg_freebsd.yaml
   when: baseline_os | lower == 'freebsd'
   tags:
     - baseline:repos
