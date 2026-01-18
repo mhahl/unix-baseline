@@ -10,6 +10,9 @@
         dest: /etc/systemd/system/baseline.service
       - src: baseline/baseline.timer.j2
         dest: /etc/systemd/system/baseline.timer
+      - src: baseline/baseline.sh.j2
+        dest: /usr/bin/baseline
+        mode: "0755"
 
 - name: Enable and start baseline timer
   ansible.builtin.systemd:

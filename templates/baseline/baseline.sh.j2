@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+#
+# Wrapper script for ansible-pull baseline configuration
+# Logs everything to systemd journal
+#
+
+set -euo pipefail
+
+# Configuration
+REPO_URL="https://github.com/mhahl/unix-baseline"
+PLAYBOOK="baseline.yaml"
+VAULT_PASS_FILE="/var/db/baseline/.credentials"
+
+# Colors for better visibility in journal
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo -e "${GREEN}Starting baseline configuration pull...${NC}" >&2
+
+# Using systemd-cat to send both stdout and stderr to journald
+# with identifier "baseline"
+if systemd-cat -t baseline --level-prefix=false \
+    /usr/bin/ansible-pull \
+        -U "$REPO_URL" \
+        "$PLAYBOOK" \
+        --clean \
+        --vault-pass-file "$VAULT_PASS_FILE" \
+        2>&1; then
+
+    echo -e "${GREEN}Baseline pull completed successfully${NC}" >&2
+    exit 0
+else
+    status=$?
+    echo -e "${RED}ERROR: ansible-pull failed with exit code $status${NC}" >&2
+    echo "See journal for details:  journalctl -t baseline -xe" >&2
+    exit $status
+fi
