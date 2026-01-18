@@ -1,8 +1,4 @@
 ---
-- name: Configure DNS stack (systemd-resolved + NetworkManager integration)
-  become: true
-
-  tasks:
 - name: Configure systemd-resolved
   ansible.builtin.template:
     src: ../templates/systemd-resolved/resolved.conf.j2
