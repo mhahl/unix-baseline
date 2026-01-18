@@ -12,5 +12,5 @@
     src: ../templates/networkmanager/dns.conf.j2
     dest: /etc/NetworkManager/conf.d/dns.conf
     mode: '0644'
-  notify: "restart networkManager"
+  notify: "restart networkmanager"
   tags: [dns, networkmanager, dns-config]
