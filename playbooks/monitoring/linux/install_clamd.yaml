@@ -35,36 +35,28 @@
     group: clamscan
     mode: '0750'
 
-- name: Check if SELinux boolean 'antivirus_can_scan_system' exists
-  ansible.builtin.command: getsebool antivirus_can_scan_system
-  register: boolean_check
-  changed_when: false
-  failed_when: false
-  ignore_errors: true
+- name: Enable SELinux boolean for system-wide scanning (persistent)
+  ansible.posix.seboolean:
+    name: antivirus_can_scan_system
+    state: true
+    persistent: true
+  when: ansible_selinux.status == 'enabled'   # or use your previous boolean_check logic
 
-- name: Enable SELinux boolean for system-wide scanning (if available)
-  ansible.builtin.command: setsebool -P antivirus_can_scan_system on
-  changed_when: false
-  when: boolean_check.rc == 0
+- name: Ensure proper SELinux file context for /var/cache/clamd
+  community.general.sefcontext:
+    target: '/var/cache/clamd(/.*)?'
+    setype: antivirus_tmp_t
+    state: present
+  register: fcontext_result
+  when: ansible_selinux.status == 'enabled'
 
-- name: Check current SELinux file context for /var/cache/clamd
-  ansible.builtin.command: >-
-    semanage fcontext -l |
-    grep '^/var/cache/clamd(/.*)?[[:space:]]*all files[[:space:]]*system_u:object_r:antivirus_tmp_t:s0'
-  register: fcontext_check
-  changed_when: false
-  failed_when: false
-  when: boolean_check.rc == 0  # Only relevant if antivirus policy is present
-
-- name: Add permanent SELinux file context for /var/cache/clamd (recursive)
-  ansible.builtin.command: semanage fcontext -a -t antivirus_tmp_t '/var/cache/clamd(/.*)?'
-  when:
-    - boolean_check.rc == 0
-    - fcontext_check.rc != 0
-
-- name: Apply correct SELinux context to /var/cache/clamd
+- name: Apply SELinux file contexts to /var/cache/clamd
   ansible.builtin.command: restorecon -R -v /var/cache/clamd
-  when: boolean_check.rc == 0
+  changed_when: "'relabeled' in restorecon_result.stdout"
+  register: restorecon_result
+  when:
+    - ansible_selinux.status == 'enabled'
+    - fcontext_result.changed
 
 - name: Deploy ClamAV configuration files
   ansible.builtin.template:

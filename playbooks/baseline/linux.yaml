@@ -18,10 +18,10 @@
     enabled: true
     state: started
 
-- name: Install ansible.general collection globally
+- name: Install required collections globally
   become: true
   ansible.builtin.command: >-
-    ansible-galaxy collection install ansible.general -p /usr/share/ansible/collections
+    ansible-galaxy collection install community.general ansible.posix -p /usr/share/ansible/collections
   args:
-    creates: /usr/share/ansible/collections/ansible_collections/ansible/general
+    creates: /usr/share/ansible/collections/ansible_collections/ansible/posix
   changed_when: false

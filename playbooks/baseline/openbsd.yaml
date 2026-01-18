@@ -8,10 +8,8 @@
     - baseline
     - baseline:configure
 
-- name: Install ansible.general collection globally
-  become: true
-  ansible.builtin.command: >-
-    ansible-galaxy collection install ansible.general -p /usr/share/ansible/collections
+- name: Install required SELinux collections
+  ansible.builtin.command: ansible-galaxy collection install ansible.posix community.general
   args:
-    creates: /usr/share/ansible/collections/ansible_collections/ansible/general
+    creates: "{{ ansible_user_dir }}/.ansible/collections/ansible_collections/ansible/posix"
   changed_when: false
