@@ -7,3 +7,11 @@
   tags:
     - baseline
     - baseline:configure
+
+- name: Install ansible.general collection globally
+  become: true
+  ansible.builtin.command: >-
+    ansible-galaxy collection install ansible.general -p /usr/share/ansible/collections
+  args:
+    creates: /usr/share/ansible/collections/ansible_collections/ansible/general
+  changed_when: false
