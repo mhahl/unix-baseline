@@ -7,3 +7,19 @@
   tags:
     - baseline:fleet
     - baseline:fleet:configure
+
+- name: Whitelist osquery in fapolicyd
+  when: ansible_facts.packages is defined and 'fapolicyd' in ansible_facts.packages
+  block:
+    - command: fapolicyd-cli --file add /opt/orbit/bin/osqueryd/linux/stable/osqueryd  --trust-file fleet-osquery
+      args:
+        creates: /etc/fapolicyd/fapolicyd.trust.d/fleet-osquery
+
+    - command: fapolicyd-cli --file add /opt/orbit/bin/orbit/orbit  --trust-file fleet-orbit
+      args:
+        creates: /etc/fapolicyd/fapolicyd.trust.d/fleet-orbit
+
+    - command: fapolicyd-cli --update
+    - systemd:
+        name: fapolicyd
+        state: restarted

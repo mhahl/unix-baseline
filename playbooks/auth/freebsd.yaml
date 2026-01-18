@@ -3,7 +3,6 @@
   ansible.builtin.package:
     name:
       - sssd2
-      - sudo-sssd
       - krb5
       - cyrus-sasl
       - cyrus-sasl-gssapi

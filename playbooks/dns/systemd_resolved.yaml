@@ -1,14 +1,16 @@
 ---
-- name: sigaint-soe | Configure DNS
-  block:
-    - name: dns | Configure systemd-resolved nameservers
-      ansible.builtin.template:
-        src: "../../templates/dns/resolved.conf.j2"
-        dest: "/etc/systemd/resolved.conf"
-        mode: "0644"
-        owner: "root"
-        group: "root"
-      tags:
-        - baseline:dns
-        - baseline:dns:configure
-        - baseline:dns:systemd
+- name: Configure systemd-resolved
+  ansible.builtin.template:
+    src: ../templates/systemd-resolved/resolved.conf.j2
+    dest: /etc/systemd/resolved.conf
+    mode: '0644'
+  notify: "restart systemd-resolved"
+  tags: [dns, systemd-resolved, dns-config]
+
+- name: Make NetworkManager use systemd-resolved
+  ansible.builtin.template:
+    src: ../templates/networkmanager/dns.conf.j2
+    dest: /etc/NetworkManager/conf.d/dns.conf
+    mode: '0644'
+  notify: "restart networkmanager"
+  tags: [dns, networkmanager, dns-config]

@@ -1,7 +1,6 @@
 ---
-- name: Configure sshd (FreeBSD only)
+- name: Configure sshd
   ansible.builtin.include_tasks: sshd/freebsd.yaml
-  when: baseline_os | lower == 'freebsd'
   tags:
     - baseline:sshd
     - baseline:sshd:configure

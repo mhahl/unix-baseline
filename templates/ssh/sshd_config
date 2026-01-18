@@ -1,123 +1,128 @@
-#	$OpenBSD: sshd_config,v 1.104 2021/07/02 05:11:21 dtucker Exp $
+# Automatically include any custom .conf files from this directory (RHEL/Fedora recommended way)
+Include /etc/ssh/sshd_config.d/*.conf
 
-# This is the sshd server system-wide configuration file.  See
-# sshd_config(5) for more information.
+# Port sshd listens on (default 22 – changing to non-standard helps reduce noise/scans)
+Port 22
 
-# This sshd was compiled with PATH=/usr/bin:/bin:/usr/sbin:/sbin
+# Which address families to listen on (any = both IPv4 and IPv6)
+AddressFamily any
 
-# The strategy used for options in the default sshd_config shipped with
-# OpenSSH is to specify options with their default value where
-# possible, but leave them commented.  Uncommented options override the
-# default value.
+# Addresses to listen on (0.0.0.0 = all IPv4 interfaces, :: = all IPv6 interfaces)
+ListenAddress 0.0.0.0
+ListenAddress ::
 
-# Note that some of FreeBSD's defaults differ from OpenBSD's, and
-# FreeBSD has a few additional options.
+# Host private keys that sshd will present to clients (order = preference order)
+HostKey /etc/ssh/ssh_host_ed25519_key           # Modern, very secure, fast (preferred)
+HostKey /etc/ssh/ssh_host_rsa_key               # For compatibility (should be ≥3072 bits)
 
-#Port 22
-#AddressFamily any
-#ListenAddress 0.0.0.0
-#ListenAddress ::
+# Key exchange algorithms (modern + post-quantum resistant options first)
+KexAlgorithms sntrup761x25519-sha512@openssh.com,curve25519-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512
 
-#HostKey /etc/ssh/ssh_host_rsa_key
-#HostKey /etc/ssh/ssh_host_ecdsa_key
-#HostKey /etc/ssh/ssh_host_ed25519_key
+# Encryption ciphers (strong authenticated encryption preferred)
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
 
-# Ciphers and keying
-#RekeyLimit default none
+# Message authentication codes (integrity protection – etm = encrypt-then-mac is best)
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com
 
-# Logging
-#SyslogFacility AUTH
-#LogLevel INFO
+# Public key algorithms accepted for host keys and user authentication
+HostKeyAlgorithms ssh-ed25519-cert-v01@openssh.com,ssh-ed25519,rsa-sha2-512-cert-v01@openssh.com,rsa-sha2-256-cert-v01@openssh.com,rsa-sha2-512,rsa-sha2-256
 
-# Authentication:
+# Public key types accepted for client authentication
+PubkeyAcceptedAlgorithms +ssh-ed25519-cert-v01@openssh.com,ssh-ed25519,rsa-sha2-512-cert-v01@openssh.com,rsa-sha2-256-cert-v01@openssh.com,rsa-sha2-512,rsa-sha2-256
 
-#LoginGraceTime 2m
-#PermitRootLogin no
-#StrictModes yes
-#MaxAuthTries 6
-#MaxSessions 10
+# Minimum RSA key size allowed (prevents weak legacy keys)
+RequiredRSASize 3072
 
-#PubkeyAuthentication yes
+# Where to send log messages (AUTH = traditional secure/auth facility)
+SyslogFacility AUTH
 
-# The default is to check both .ssh/authorized_keys and .ssh/authorized_keys2
-# but this is overridden so installations will only check .ssh/authorized_keys
-AuthorizedKeysFile	.ssh/authorized_keys
+# How detailed logging should be (VERBOSE shows successful & failed auth + which method)
+LogLevel VERBOSE
 
-#AuthorizedPrincipalsFile none
+# How long a client has to complete authentication before being disconnected
+LoginGraceTime 45
 
-#AuthorizedKeysCommand none
-#AuthorizedKeysCommandUser nobody
+# Completely disable root login over SSH (very strong security recommendation)
+PermitRootLogin no
 
-# For this to work you will also need host keys in /etc/ssh/ssh_known_hosts
-#HostbasedAuthentication no
-# Change to yes if you don't trust ~/.ssh/known_hosts for
-# HostbasedAuthentication
-#IgnoreUserKnownHosts no
-# Don't read the user's ~/.rhosts and ~/.shosts files
-#IgnoreRhosts yes
+# Check file/directory permissions of user's home, .ssh/, authorized_keys etc.
+StrictModes yes
 
-# Change to yes to enable built-in password authentication.
-# Note that passwords may also be accepted via KbdInteractiveAuthentication.
-#PasswordAuthentication no
-PermitEmptyPasswords no
+# Maximum authentication attempts allowed per connection (helps against brute-force)
+MaxAuthTries 4
 
-# Change to no to disable PAM authentication
-#KbdInteractiveAuthentication yes
+# Maximum concurrent sessions per connection (limits multiplexing abuse)
+MaxSessions 8
 
-# Kerberos options
-KerberosAuthentication no
-#KerberosOrLocalPasswd yes
-#KerberosTicketCleanup yes
-#KerberosGetAFSToken no
+# Allow public key authentication (highly recommended – main secure method)
+PubkeyAuthentication yes
 
-# GSSAPI options
-GSSAPIAuthentication yes
-#GSSAPICleanupCredentials yes
+# Allow password authentication
+PasswordAuthentication yes
 
-# Set this to 'no' to disable PAM authentication, account processing,
-# and session processing. If this is enabled, PAM authentication will
-# be allowed through the KbdInteractiveAuthentication and
-# PasswordAuthentication.  Depending on your PAM configuration,
-# PAM authentication via KbdInteractiveAuthentication may bypass
-# the setting of "PermitRootLogin prohibit-password".
-# If you just want the PAM account and session checks to run without
-# PAM authentication, then enable this but set PasswordAuthentication
-# and KbdInteractiveAuthentication to 'no'.
+# Allow keyboard-interactive authentication (needed for PAM prompts on RHEL/Fedora)
+KbdInteractiveAuthentication yes
+
+# Use PAM for authentication, account, session and password management (required on RHEL/Fedora)
 UsePAM yes
 
-#AllowAgentForwarding yes
-#AllowTcpForwarding yes
-#GatewayPorts no
-#X11Forwarding no
-#X11DisplayOffset 10
-#X11UseLocalhost yes
-#PermitTTY yes
-#PrintMotd yes
-#PrintLastLog yes
-#TCPKeepAlive yes
-#PermitUserEnvironment no
-#Compression delayed
-#ClientAliveInterval 0
-#ClientAliveCountMax 3
-#UseDNS yes
-#PidFile /var/run/sshd.pid
-#MaxStartups 10:30:100
-#PermitTunnel no
-#ChrootDirectory none
-#UseBlacklist no
-#VersionAddendum FreeBSD-20240318
+# Never allow empty/blank passwords (even if PAM would technically allow it)
+PermitEmptyPasswords no
 
-# no default banner path
-#Banner none
+# Restrict SSH access to only users who are members of this group (primary or supplementary)
+# This is the key line that enforces "only grp-sigaint-users members may login"
+AllowGroups grp-sigaint-users
 
-# override default of no subsystems
-Subsystem	sftp	/usr/libexec/sftp-server
+# Disable agent forwarding (prevents keys being forwarded to potentially compromised hosts)
+AllowAgentForwarding no
 
-# Example of overriding settings on a per-user basis
-#Match User anoncvs
-#	X11Forwarding no
-#	AllowTcpForwarding no
-#	PermitTTY no
-#	ForceCommand cvs server
-PermitRootLogin yes
-PasswordAuthentication yes
+# Disable all TCP forwarding/tunneling (very restrictive – good security posture)
+AllowTcpForwarding no
+
+# Prevent clients from binding forwarded ports to non-loopback addresses
+GatewayPorts no
+
+# Disable X11 forwarding (almost never needed anymore + security risk)
+X11Forwarding no
+
+# Allow interactive shell/TTY (usually yes unless you're only doing port forwarding)
+PermitTTY yes
+
+# Don't print /etc/motd when logging in (many prefer cleaner login)
+PrintMotd no
+
+# Show last login time (useful for detecting unauthorized access)
+PrintLastLog yes
+
+# Send keepalive messages to detect dead connections
+TCPKeepAlive yes
+
+# Send client alive messages every 300 seconds (5 min)
+ClientAliveInterval 300
+
+# Disconnect after 0 missed keepalive responses → 5 min idle timeout
+ClientAliveCountMax 0
+
+# Don't do DNS lookups on client IP (speeds up connection + avoids DNS poisoning)
+UseDNS no
+
+# Rate-limit new unauthenticated connections (10 unauth at once, 30% more allowed, max 60)
+MaxStartups 10:30:60
+
+# Don't allow environment variables to be set by client
+PermitUserEnvironment no
+
+# Disable tun/tap device forwarding (almost never needed)
+PermitTunnel no
+
+# Don't show any pre-login banner
+Banner none
+
+# SFTP subsystem – path to internal-sftp or sftp-server binary
+Subsystem sftp /usr/libexec/openssh/sftp-server
+
+# PerSourcePenalties (OpenSSH 9.8+): built-in IP penalty for bad behavior
+# authfail:10s  ← each failed auth attempt adds 10 seconds penalty to the IP
+# Penalties accumulate → if total > min (default 15s), connection refused
+# Other penalties kept at sane defaults; adjust as needed
+PerSourcePenalties authfail:5s crash:90s noauth:1s grace-exceeded:20s refuseconnection:10s

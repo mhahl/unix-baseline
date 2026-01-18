@@ -5,3 +5,9 @@
     mode: "{{ item.mode }}"
   with_items:
     - { template: cron/baseline.freebsd, dest: /etc/cron.d/baseline, mode: "0644" }
+
+- name: Install required SELinux collections
+  ansible.builtin.command: ansible-galaxy collection install ansible.posix community.general
+  args:
+    creates: "{{ ansible_user_dir }}/.ansible/collections/ansible_collections/ansible/posix"
+  changed_when: false
