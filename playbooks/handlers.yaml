@@ -140,3 +140,17 @@
     state: restarted
   listen: "restart clamonacc"
   when: baseline_os | lower == 'linux'
+
+- name: Restart systemd-resolved
+  systemd:
+    name: systemd-resolved
+    state: restarted
+  listen: "restart systemd-resolved"
+  when: baseline_os | lower == 'linux'
+
+- name: Restart NetworkManager
+  systemd:
+    name: NetworkManager
+    state: restarted
+  listen: "restart networkmanager"
+  when: baseline_os | lower == 'linux'
