@@ -2,6 +2,7 @@
 - name: Check if Falco GPG key is already imported
   ansible.builtin.command: rpm -q gpg-pubkey --qf '%{name}-%{version}-%{release} %{summary}\n'
   register: imported_keys
+  changed_when: false
 
 - name: Import Falco GPG key (only if not present)
   ansible.builtin.command: rpm --import https://falco.org/repo/falcosecurity-packages.asc
