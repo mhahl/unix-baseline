@@ -1,9 +1,0 @@
-- rule: Write below etc
-  exceptions:
-    - name: proc_slapd_dirsrv_only
-      fields: [proc.exe, fd.name]
-      comps: [=, startswith]
-      values:
-        - ["/usr/sbin/ns-slapd", "/etc/dirsrv"]
-  override:
-    exceptions: append

@@ -47,6 +47,25 @@
     mode: '0644'
   notify: Restart Falco
 
+
+- name: Find all old rule files
+  ansible.builtin.find:
+    paths: /etc/falco/rules.d
+    recurse: no
+    file_type: file
+    excludes:
+      - sigaint_rules.yaml
+  register: files_found
+
+- name: Delete unwanted rule files
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ files_found.files }}"
+  loop_control:
+    label: "{{ item.path | basename }}"
+  when: files_found.matched > 0
+
 - name: Deploy custom falco rules
   ansible.builtin.template:
     src: "templates/falco/rules.d/{{ item.src }}"
@@ -55,10 +74,7 @@
     group: root
     mode: "0640"
   loop:
-    - { src: freeipa_rules.yaml }
-    - { src: podman_rules.yaml }
-    - { src: systemd_rules.yaml }
-
+    - { src: sigaint_rules.yaml  }
 
 - name: Ensure Falco modern_ebpf service is enabled and started
   systemd:
