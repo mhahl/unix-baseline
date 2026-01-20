@@ -49,6 +49,15 @@
       comps: [=, =]
       values:
         - ["/usr/lib/systemd/systemd-executor", "/etc/.pwd.lock"]
+
+    # [Component: CUPS]
+    # Allow the print daemon to update subscriptions, printers, and classes.
+    # We use 'startswith /etc/cups/' to cover subscriptions.conf.N, printers.conf, etc.
+    - name: cupsd_write_config
+      fields: [proc.exe, fd.name]
+      comps: [=, startswith]
+      values:
+        - ["/usr/bin/cupsd", "/etc/cups/"]
   override:
     exceptions: append
 
@@ -98,5 +107,15 @@
       values:
         - ["/usr/lib/systemd/systemd-executor", "/etc/pam.d/"]
         - ["/usr/lib/systemd/systemd-userwork", "/etc/shadow"]
+
+    # [Component: Osquery/Orbit]
+    # Allow Osquery (security agent) to scan the system state.
+    # Uses proc.name because the binary path varies (e.g. /opt/orbit/..., /usr/bin/...)
+    # and it needs to read ALL sensitive files, not just specific ones.
+    - name: osquery_agent_read_all
+      fields: [proc.name]
+      comps: [=]
+      values:
+        - ["osqueryd"]
   override:
     exceptions: append
