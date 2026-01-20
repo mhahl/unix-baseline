@@ -54,7 +54,9 @@
     recurse: no
     file_type: file
     excludes:
-      - sigaint_rules.yaml
+      - exceptions.yaml
+      - detections.yaml
+      - cve_2025_32463.yaml
   register: files_found
 
 - name: Delete unwanted rule files
@@ -74,7 +76,15 @@
     group: root
     mode: "0640"
   loop:
-    - { src: sigaint_rules.yaml  }
+
+    # Quiet known and trusted software
+    - { src: detections.yaml  }
+
+    # Custom detections
+    - { src: exceptions.yaml  }
+
+      # https://nvd.nist.gov/vuln/detail/CVE-2025-32463
+    - { src: cve_2025_32463.yaml  }
 
 - name: Ensure Falco modern_ebpf service is enabled and started
   systemd:

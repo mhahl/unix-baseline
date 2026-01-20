@@ -1,3 +1,10 @@
+# ==============================================================================
+# RULE: EXECUTION FROM TEMPORARY FILESYSTEMS (Droppers)
+# ==============================================================================
+# Detects when a binary is executed from /tmp or /dev/shm.
+# Attackers often download droppers or crypto-miners here because:
+# 1. They are globally writable.
+# 2. Security teams often forget to mount them as 'noexec'.
 - rule: Execution from /tmp or /dev/shm
   desc: Detects execution of binaries from temporary directories, a common dropper behavior.
   condition: >
@@ -5,19 +12,27 @@
     (
       proc.exepath startswith "/tmp/" or 
       proc.exepath startswith "/dev/shm/" or
-      proc.cwd startswith "/tmp/" or
+      proc.cwd startswith "/tmp/" or 
       proc.cwd startswith "/dev/shm/"
-    ) and not proc.name in (runc, docker-runc)
+    )
+    and not proc.name in ("runc")
   output: >
     Suspicious binary execution from temporary storage 
     (file=%proc.exepath cmd=%proc.cmdline user=%user.name container=%container.name)
   priority: WARNING
   tags: [mitre_execution, droppers]
 
+
+# ==============================================================================
+# RULE: SHELL HISTORY TAMPERING (Defense Evasion)
+# ==============================================================================
+# Detects when a user tries to hide their tracks by modifying history files.
+# Covers deletion (unlink), truncation (open_write), and hiding (rename).
+# Targets .bash_history, .zsh_history, etc.
 - rule: Shell History Tampering
   desc: Detects attempts to delete, truncate, or symlink shell history files.
   condition: >
-    (open_write or open_trunc or unlink) and 
+    (open_write or evt.type in (unlink, unlinkat, rename, renameat)) and 
     fd.name endswith "history" and 
     (fd.name contains ".bash_" or fd.name contains ".zsh_" or fd.name contains ".sh_")
   output: >
@@ -25,18 +40,32 @@
   priority: WARNING
   tags: [mitre_defense_evasion, logging]
 
+
+# ==============================================================================
+# RULE: FILELESS EXECUTION (memfd_create)
+# ==============================================================================
+# Detects the 'memfd_create' syscall, which creates an anonymous file in RAM.
+# Advanced malware uses this to execute code without touching the disk
+# (bypassing traditional antivirus scanning).
 - rule: Fileless Execution via memfd_create
   desc: >
-    Detects the creation of memory-only files often used for fileless malware 
-    execution or code injection.
+    Detects the creation of memory-only files (memfd), a technique often used for 
+    fileless malware execution or code injection to bypass disk scanning.
   condition: >
-    evt.type = memfd_create and 
-    evt.dir = <
+    evt.type = memfd_create
   output: >
     Fileless execution attempt via memfd_create (process=%proc.name command=%proc.cmdline)
   priority: CRITICAL
-  tags: [ mitre_execution, fileless_malware ]
+  tags: [mitre_execution, fileless_malware]
 
+
+# ==============================================================================
+# RULE: INTERPRETER OUTBOUND CONNECTION (C2/Exfiltration)
+# ==============================================================================
+# Detects when scripting languages (Python, Perl, Bash, etc.) initiate
+# OUTBOUND network connections.
+# In production, web servers usually receive traffic (inbound), but rarely
+# initiate new connections to the internet (which suggests a Reverse Shell).
 - rule: Interpreter Outbound Connection
   desc: Detects standard interpreters/shells initiating network connections.
   condition: >
@@ -46,4 +75,55 @@
   output: >
     Interpreter established outbound connection (prog=%proc.name target=%fd.sip:%fd.sport)
   priority: WARNING
-  tags: [ mitre_c2, exfiltration ]
+  tags: [mitre_c2, exfiltration]
+
+
+# ==============================================================================
+# RULE: KERNEL MODULE MODIFICATION (PrivEsc / Rootkits)
+# ==============================================================================
+# Detects attempts to load or unload kernel modules.
+# In containerized environments, the kernel is shared with the host.
+# A container trying to load a module (e.g., a rootkit or hardware driver)
+# is a severe security violation indicating a container breakout attempt.
+- rule: Kernel Module Modification Attempt
+  desc: Detects attempts to insert (insmod) or remove (rmmod) kernel modules.
+  condition: >
+    spawned_process and 
+    proc.name in (insmod, modprobe, rmmod, lsmod) and 
+    not user.name = "root"
+  output: >
+    Kernel module modification attempted (tool=%proc.name user=%user.name cmd=%proc.cmdline)
+  priority: CRITICAL
+  tags: [ mitre_privilege_escalation, persistence ]
+
+# ==============================================================================
+# RULE: SUDOERS FILE MODIFICATION (Persistence/PrivEsc)
+# ==============================================================================
+# Detects writing to /etc/sudoers or the /etc/sudoers.d directory.
+# Attackers modify these files to grant themselves password-less sudo rights
+# (e.g. "ALL=(ALL) NOPASSWD: ALL") to maintain persistence.
+- rule: Sudoers Modification
+  desc: Detects attempts to write to sudoers configuration files.
+  condition: >
+    open_write and 
+    (fd.name = "/etc/sudoers" or fd.name startswith "/etc/sudoers.d/")
+  output: >
+    Sudoers file opened for writing (file=%fd.name process=%proc.name user=%user.name)
+  priority: CRITICAL
+  tags: [mitre_privilege_escalation, persistence]
+
+# ==============================================================================
+# RULE: NETWORK RECONNAISSANCE TOOLS (Discovery)
+# ==============================================================================
+# Detects the execution of known network scanning and mapping tools.
+# These tools (nmap, masscan, netcat) are rarely used in production
+# application containers but are the first tools an attacker uses to map the network.
+- rule: Network Reconnaissance Tools
+  desc: Detects the launch of network scanning tools.
+  condition: >
+    spawned_process and 
+    proc.name in (nmap, masscan, ncat, netcat, nc, socat, tcpdump, tshark)
+  output: >
+    Network reconnaissance tool launched (tool=%proc.name cmd=%proc.cmdline user=%user.name)
+  priority: NOTICE
+  tags: [mitre_discovery, mitre_lateral_movement]
