@@ -162,3 +162,19 @@
         - ["/osqueryd", "/var/lib/rpm/"]
   override:
     exceptions: append
+
+# ==============================================================================
+# RULE: READ SSH INFORMATION
+# ==============================================================================
+- rule: Read ssh information
+  exceptions:
+    # [Component: Systemd]
+    # Allow systemd-tmpfiles to scan SSH directories during cleanup/maintenance.
+    # It often checks permissions or ages of files in /root/.ssh.
+    - name: systemd_tmpfiles_ssh
+      fields: [proc.exe, fd.name]
+      comps: [=, startswith]
+      values:
+        - ["/usr/bin/systemd-tmpfiles", "/root/.ssh"]
+  override:
+    exceptions: append
