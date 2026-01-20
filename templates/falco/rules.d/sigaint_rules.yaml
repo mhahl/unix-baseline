@@ -144,3 +144,21 @@
         - ["/app/chromedriver", "flaresolverr/flaresolverr"]
   override:
     exceptions: append
+
+# ==============================================================================
+# RULE: RPM DATABASE OPEN WRITING
+# ==============================================================================
+- rule: RPM Database Open Writing
+  exceptions:
+    # [Component: Osquery/Orbit]
+    # Allow osqueryd to write to RPM SQLite artifacts (WAL/SHM files).
+    # This is required for osquery to query installed packages on modern Linux.
+    # We use 'endswith /osqueryd' to match the Orbit path:
+    # /opt/orbit/bin/osqueryd/linux/stable/osqueryd
+    - name: osquery_rpmdb_write
+      fields: [proc.exepath, fd.name]
+      comps: [endswith, startswith]
+      values:
+        - ["/osqueryd", "/var/lib/rpm/"]
+  override:
+    exceptions: append
