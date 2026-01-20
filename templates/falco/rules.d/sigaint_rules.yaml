@@ -58,9 +58,17 @@
       comps: [=, startswith]
       values:
         - ["/usr/bin/cupsd", "/etc/cups/"]
+
+    # [Component: Certmonger]
+    # Allow certmonger agents to update NSS databases (keys/certs) in /etc/pki.
+    # Uses proc.exepath because proc.name is often truncated (e.g. "dogtag-ipa-rene").
+    - name: certmonger_update_pki
+      fields: [proc.exepath, fd.name]
+      comps: [=, startswith]
+      values:
+        - ["/usr/libexec/certmonger/dogtag-ipa-renew-agent-submit", "/etc/pki/nssdb/"]
   override:
     exceptions: append
-
 
 # ==============================================================================
 # RULE: WRITE BELOW BINARY DIR
@@ -118,5 +126,21 @@
       comps: [=]
       values:
         - ["osqueryd"]
+  override:
+    exceptions: append
+
+# ==============================================================================
+# RULE: EXECUTING BINARY NOT PART OF BASE IMAGE
+# ==============================================================================
+- rule: Executing binary not part of base image
+  exceptions:
+    # [Component: Flaresolverr]
+    # Allow chromedriver to run, even if it resides in an upper filesystem layer.
+    # We scope this strictly to the flaresolverr container image.
+    - name: flaresolverr_chromedriver
+      fields: [proc.exe, container.image.repository]
+      comps: [=, endswith]
+      values:
+        - ["/app/chromedriver", "flaresolverr/flaresolverr"]
   override:
     exceptions: append
