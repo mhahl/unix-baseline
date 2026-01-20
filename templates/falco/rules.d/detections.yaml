@@ -15,13 +15,12 @@
       proc.cwd startswith "/tmp/" or 
       proc.cwd startswith "/dev/shm/"
     )
-    and not proc.name in ("runc")
+    and not proc.name in ("runc", "docker", "podman", "containerd")
   output: >
     Suspicious binary execution from temporary storage 
     (file=%proc.exepath cmd=%proc.cmdline user=%user.name container=%container.name)
   priority: WARNING
   tags: [mitre_execution, droppers]
-
 
 # ==============================================================================
 # RULE: SHELL HISTORY TAMPERING (Defense Evasion)
@@ -40,7 +39,6 @@
   priority: WARNING
   tags: [mitre_defense_evasion, logging]
 
-
 # ==============================================================================
 # RULE: FILELESS EXECUTION (memfd_create)
 # ==============================================================================
@@ -57,26 +55,6 @@
     Fileless execution attempt via memfd_create (process=%proc.name command=%proc.cmdline)
   priority: CRITICAL
   tags: [mitre_execution, fileless_malware]
-
-
-# ==============================================================================
-# RULE: INTERPRETER OUTBOUND CONNECTION (C2/Exfiltration)
-# ==============================================================================
-# Detects when scripting languages (Python, Perl, Bash, etc.) initiate
-# OUTBOUND network connections.
-# In production, web servers usually receive traffic (inbound), but rarely
-# initiate new connections to the internet (which suggests a Reverse Shell).
-- rule: Interpreter Outbound Connection
-  desc: Detects standard interpreters/shells initiating network connections.
-  condition: >
-    outbound and 
-    proc.name in (python, python3, perl, ruby, lua, php, bash, sh, zsh) and 
-    not (fd.sip in (127.0.0.1, ::1))
-  output: >
-    Interpreter established outbound connection (prog=%proc.name target=%fd.sip:%fd.sport)
-  priority: WARNING
-  tags: [mitre_c2, exfiltration]
-
 
 # ==============================================================================
 # RULE: KERNEL MODULE MODIFICATION (PrivEsc / Rootkits)
