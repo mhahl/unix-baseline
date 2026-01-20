@@ -50,7 +50,8 @@
     Detects the creation of memory-only files (memfd), a technique often used for 
     fileless malware execution or code injection to bypass disk scanning.
   condition: >
-    evt.type = memfd_create
+    evt.type = memfd_create and 
+    not proc.name in (systemd, systemd-executor, systemd-journald)
   output: >
     Fileless execution attempt via memfd_create (process=%proc.name command=%proc.cmdline)
   priority: CRITICAL
@@ -105,3 +106,73 @@
     Network reconnaissance tool launched (tool=%proc.name cmd=%proc.cmdline user=%user.name)
   priority: NOTICE
   tags: [mitre_discovery, mitre_lateral_movement]
+
+# ==============================================================================
+# RULE: OBFUSCATED COMMAND EXECUTION (Base64)
+# ==============================================================================
+# Detects commands being piped into base64 decoding.
+# Attackers often encode their payloads (e.g., `echo "bWFsaWNpb3VzCg==" | base64 -d | sh`)
+# to bypass keyword detection filters (like WAFs or simple grep).
+- rule: Obfuscated Base64 Execution
+  desc: Detects shell commands using base64 decoding, often used to hide payloads.
+  condition: >
+    spawned_process and 
+    (proc.cmdline contains "base64" and (proc.cmdline contains "-d" or proc.cmdline contains "--decode"))
+  output: >
+    Obfuscated base64 command execution (cmd=%proc.cmdline user=%user.name)
+  priority: WARNING
+  tags: [mitre_defense_evasion, obfuscation]
+
+# ==============================================================================
+# RULE: LOCAL ACCOUNT MANIPULATION
+# ==============================================================================
+# Detects the creation or deletion of user accounts.
+# Attackers may create a "backdoor" user (e.g., 'service-admin') to
+# blend in and log in legitimately later.
+- rule: User Account Manipulation
+  desc: Detects execution of user/group management commands.
+  condition: >
+    spawned_process and 
+    proc.name in (useradd, userdel, usermod, groupadd, groupdel, adduser, deluser)
+  output: >
+    User account manipulation detected (tool=%proc.name cmd=%proc.cmdline user=%user.name)
+  priority: NOTICE
+  tags: [mitre_persistence, create_account]
+
+# ==============================================================================
+# RULE: PERSISTENCE VIA SSH KEYS
+# ==============================================================================
+# Detects writing to 'authorized_keys'.
+# A common post-exploitation step is injecting the attacker's public key
+# into a user's .ssh directory to bypass password requirements later.
+- rule: SSH Key Injection (authorized_keys)
+  desc: Detects attempts to write to authorized_keys files.
+  condition: >
+    open_write and 
+    fd.name endswith "/authorized_keys" and 
+    not proc.name in (sshd)
+  output: >
+    SSH authorized_keys modified (file=%fd.name process=%proc.name user=%user.name)
+  priority: CRITICAL
+  tags: [mitre_persistence, ssh_keys]
+
+
+# ==============================================================================
+# RULE: PERSISTENCE VIA CRON JOB
+# ==============================================================================
+# Detects modifications to cron directories or files.
+# Attackers often add a scheduled task to re-execute their reverse shell
+# every hour/day to maintain access even if the process is killed.
+- rule: Persistence via Cron Modification
+  desc: Detects attempts to write to cron scheduling directories.
+  condition: >
+    open_write and 
+    (
+      fd.name startswith "/etc/cron" or 
+      fd.name startswith "/var/spool/cron/" or 
+      fd.name = "/etc/crontab"
+    ) and not proc.name in (crond, anacron)
+  output: >
+    Cron configuration modified (file=%fd.name process=%proc.name user=%user.name)
+  priority: WARNING
+  tags: [mitre_persistence, scheduled_task]
