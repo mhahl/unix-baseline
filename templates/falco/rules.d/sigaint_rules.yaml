@@ -107,6 +107,7 @@
       values:
         - ["/usr/lib/systemd/systemd-executor", "/etc/pam.d/"]
         - ["/usr/lib/systemd/systemd-userwork", "/etc/shadow"]
+        - ["/usr/lib/systemd/systemd-executor", "/etc/shadow"]
 
     # [Component: Osquery/Orbit]
     # Allow Osquery (security agent) to scan the system state.
