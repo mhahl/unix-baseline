@@ -1,0 +1,49 @@
+- rule: Execution from /tmp or /dev/shm
+  desc: Detects execution of binaries from temporary directories, a common dropper behavior.
+  condition: >
+    spawned_process and 
+    (
+      proc.exepath startswith "/tmp/" or 
+      proc.exepath startswith "/dev/shm/" or
+      proc.cwd startswith "/tmp/" or
+      proc.cwd startswith "/dev/shm/"
+    ) and not proc.name in (runc, docker-runc)
+  output: >
+    Suspicious binary execution from temporary storage 
+    (file=%proc.exepath cmd=%proc.cmdline user=%user.name container=%container.name)
+  priority: WARNING
+  tags: [mitre_execution, droppers]
+
+- rule: Shell History Tampering
+  desc: Detects attempts to delete, truncate, or symlink shell history files.
+  condition: >
+    (open_write or open_trunc or unlink) and 
+    fd.name endswith "history" and 
+    (fd.name contains ".bash_" or fd.name contains ".zsh_" or fd.name contains ".sh_")
+  output: >
+    Shell history tampered with (action=%evt.type file=%fd.name user=%user.name)
+  priority: WARNING
+  tags: [mitre_defense_evasion, logging]
+
+- rule: Fileless Execution via memfd_create
+  desc: >
+    Detects the creation of memory-only files often used for fileless malware 
+    execution or code injection.
+  condition: >
+    evt.type = memfd_create and 
+    evt.dir = <
+  output: >
+    Fileless execution attempt via memfd_create (process=%proc.name command=%proc.cmdline)
+  priority: CRITICAL
+  tags: [ mitre_execution, fileless_malware ]
+
+- rule: Interpreter Outbound Connection
+  desc: Detects standard interpreters/shells initiating network connections.
+  condition: >
+    outbound and 
+    proc.name in (python, python3, perl, ruby, lua, php, bash, sh, zsh) and 
+    not (fd.sip in (127.0.0.1, ::1))
+  output: >
+    Interpreter established outbound connection (prog=%proc.name target=%fd.sip:%fd.sport)
+  priority: WARNING
+  tags: [ mitre_c2, exfiltration ]

@@ -132,7 +132,7 @@
 # ==============================================================================
 # RULE: EXECUTING BINARY NOT PART OF BASE IMAGE
 # ==============================================================================
-- rule: Executing binary not part of base image
+- rule: Drop and execute new binary in container
   exceptions:
     # [Component: Flaresolverr]
     # Allow chromedriver to run, even if it resides in an upper filesystem layer.
@@ -148,7 +148,7 @@
 # ==============================================================================
 # RULE: RPM DATABASE OPEN WRITING
 # ==============================================================================
-- rule: RPM Database Open Writing
+- rule: Write below rpm database
   exceptions:
     # [Component: Osquery/Orbit]
     # Allow osqueryd to write to RPM SQLite artifacts (WAL/SHM files).
