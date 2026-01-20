@@ -176,3 +176,34 @@
     Cron configuration modified (file=%fd.name process=%proc.name user=%user.name)
   priority: WARNING
   tags: [mitre_persistence, scheduled_task]
+
+# ==============================================================================
+# RULE: eBPF PROGRAM LOADING (Syscall)
+# ==============================================================================
+# Detects the 'bpf' syscall with the BPF_PROG_LOAD command (5).
+# This captures any process trying to inject code into the kernel.
+- rule: eBPF Program Loading (bpf syscall)
+  desc: Detects attempts to load eBPF programs into the kernel.
+  condition: >
+    evt.type = bpf and 
+    (evt.arg.cmd = "BPF_PROG_LOAD" or evt.arg.cmd = 5) and 
+    not proc.name in (falco, falco-bpf, systemd, systemd-journal, kube-proxy, cilium-agent, calico-node)
+  output: >
+    eBPF program loaded into kernel (cmd=%evt.arg.cmd process=%proc.name user=%user.name container=%container.name)
+  priority: WARNING
+  tags: [mitre_persistence, mitre_defense_evasion, rootkit, ebpf]
+
+# ==============================================================================
+# RULE: eBPF MANAGEMENT TOOL EXECUTION
+# ==============================================================================
+# Detects the execution of 'bpftool', which is used to inspect or manage
+# BPF programs and maps. Attackers use this to list existing hooks or load new ones.
+- rule: eBPF Management Tool Execution
+  desc: Detects execution of bpftool.
+  condition: >
+    spawned_process and 
+    (proc.name = "bpftool" or proc.exepath endswith "/bpftool")
+  output: >
+    eBPF management tool executed (user=%user.name command=%proc.cmdline)
+  priority: NOTICE
+  tags: [mitre_discovery, ebpf]
