@@ -1,6 +1,6 @@
 ---
 - name: Configure sshd
-  ansible.builtin.include_tasks: sshd/freebsd.yaml
+  ansible.builtin.include_tasks: sshd/all.yaml
   tags:
     - baseline:sshd
     - baseline:sshd:configure
