@@ -75,6 +75,7 @@
     owner: root
     group: root
     mode: "0640"
+  notify: Restart Falco
   loop:
 
     # Quiet known and trusted software

