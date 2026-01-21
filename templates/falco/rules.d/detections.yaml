@@ -57,7 +57,10 @@
       systemd-journald, 
       cockpit-tls,
       setroubleshootd,
-      SetroubleshootP
+      SetroubleshootP,
+      chrome,
+      pipewire,
+      pipewire-pulse
     )
   output: >
     Fileless execution attempt via memfd_create (process=%proc.name command=%proc.cmdline)
