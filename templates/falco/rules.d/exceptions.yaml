@@ -108,7 +108,6 @@
 - rule: Read sensitive file untrusted
   exceptions:
     # [Component: Systemd]
-    # Allow systemd components to read PAM configs and Shadow files for authentication.
     - name: systemd_sensitive_reads
       fields: [proc.exe, fd.name]
       comps: [=, startswith]
@@ -118,14 +117,19 @@
         - ["/usr/lib/systemd/systemd-executor", "/etc/shadow"]
 
     # [Component: Osquery/Orbit]
-    # Allow Osquery (security agent) to scan the system state.
-    # Uses proc.name because the binary path varies (e.g. /opt/orbit/..., /usr/bin/...)
-    # and it needs to read ALL sensitive files, not just specific ones.
     - name: osquery_agent_read_all
       fields: [proc.name]
       comps: [=]
       values:
         - ["osqueryd"]
+
+    # [Component: ThinLinc]
+    # Allow ThinLinc PAM helper to read authentication configs.
+    - name: thinlinc_pam_read
+      fields: [proc.exepath, fd.name]
+      comps: [=, startswith]
+      values:
+        - ["/opt/thinlinc/libexec/tl-pamapp", "/etc/pam.d/"]
   override:
     exceptions: append
 
