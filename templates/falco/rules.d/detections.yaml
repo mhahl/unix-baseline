@@ -366,7 +366,6 @@
   priority: CRITICAL
   tags: [mitre_persistence, scheduled_task, systemd]
 
-
 # ==============================================================================
 # RULE: SYSTEMD TIMER ACTIVATION
 # ==============================================================================

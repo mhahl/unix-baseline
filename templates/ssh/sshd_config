@@ -81,6 +81,7 @@ AllowTcpForwarding no
 
 # Prevent clients from binding forwarded ports to non-loopback addresses
 GatewayPorts no
+PermitOpen 127.0.0.1:*
 
 # Disable X11 forwarding (almost never needed anymore + security risk)
 X11Forwarding no
