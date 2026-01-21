@@ -383,4 +383,4 @@
   output: >
     Systemd timer enabled or started (command=%proc.cmdline user=%user.name)
   priority: WARNING
-  tags: [mitre_persistence, scheduled_task
+  tags: [mitre_persistence, scheduled_task]
