@@ -51,7 +51,14 @@
     fileless malware execution or code injection to bypass disk scanning.
   condition: >
     evt.type = memfd_create and 
-    not proc.name in (systemd, systemd-executor, systemd-journald, cockpit-tls)
+    not proc.name in (
+      systemd, 
+      systemd-executor, 
+      systemd-journald, 
+      cockpit-tls,
+      setroubleshootd,
+      SetroubleshootP
+    )
   output: >
     Fileless execution attempt via memfd_create (process=%proc.name command=%proc.cmdline)
   priority: CRITICAL
@@ -244,3 +251,132 @@
     (shell=%proc.name target=%fd.sip:%fd.sport cmd=%proc.cmdline)
   priority: WARNING
   tags: [mitre_command_and_control, reverse_shell]
+
+# ==============================================================================
+# RULE: SUID/SGID BIT SETTING
+# ==============================================================================
+# Detects 'chmod' being used to add SUID (u+s) or SGID (g+s) bits.
+# Attackers do this to create "backdoor" binaries that always run as root.
+- rule: SUID/SGID Bit Set via Chmod
+  desc: Detects attempts to set the SUID or SGID bit on a file.
+  condition: >
+    spawned_process and 
+    proc.name = "chmod" and 
+    (proc.cmdline contains "u+s" or proc.cmdline contains "g+s" or proc.cmdline contains "4755")
+  output: >
+    SUID/SGID bit set on file (cmd=%proc.cmdline user=%user.name file=%proc.args)
+  priority: CRITICAL
+  tags: [mitre_privilege_escalation, persistence]
+
+# ==============================================================================
+# RULE: SUID BINARY RECONNAISSANCE
+# ==============================================================================
+# Detects 'find' commands scanning for files with permission 4000 (SUID).
+# This is a standard enumeration step for attackers looking for GTFOBins.
+- rule: SUID Binary Reconnaissance
+  desc: Detects attempts to enumerate SUID binaries on the system.
+  condition: >
+    spawned_process and 
+    proc.name = "find" and 
+    (proc.cmdline contains "-perm" and (proc.cmdline contains "4000" or proc.cmdline contains "u=s"))
+  output: >
+    Scanning for SUID binaries detected (cmd=%proc.cmdline user=%user.name)
+  priority: NOTICE
+  tags: [mitre_discovery, enumeration]
+
+# ==============================================================================
+# RULE: DANGEROUS CAPABILITIES ASSIGNMENT
+# ==============================================================================
+# Detects the use of 'setcap' to assign capabilities to files.
+# Attackers use this to give standard binaries (like python or tar)
+# root-level powers without setting the obvious SUID bit.
+- rule: Capabilities Modified (setcap)
+  desc: Detects execution of the setcap utility.
+  condition: >
+    spawned_process and 
+    proc.name = "setcap"
+  output: >
+    File capabilities modified via setcap (cmd=%proc.cmdline user=%user.name)
+  priority: CRITICAL
+  tags: [mitre_privilege_escalation, capabilities]
+
+# ==============================================================================
+# RULE: SHARED LIBRARY INJECTION (LD_PRELOAD)
+# ==============================================================================
+# Detects processes spawned with the LD_PRELOAD environment variable.
+# This is a common method to hook system calls and inject code into running processes.
+- rule: LD_PRELOAD Injection Detected
+  desc: Detects the presence of LD_PRELOAD in process environment variables.
+  condition: >
+    spawned_process and 
+    proc.env contains "LD_PRELOAD=" and 
+    not proc.name in (fakeroot)
+  output: >
+    Process spawned with LD_PRELOAD environment variable 
+    (user=%user.name command=%proc.cmdline env=%proc.env)
+  priority: CRITICAL
+  tags: [mitre_privilege_escalation, mitre_defense_evasion, rootkit]
+
+# ==============================================================================
+# RULE: LOGIN HISTORY ERASURE (utmp/wtmp/btmp)
+# ==============================================================================
+# Detects tampering with binary login records.
+# /var/run/utmp (current logins), /var/log/wtmp (login history), /var/log/btmp (failed logins).
+# Attackers "scrub" these files to remove the record of their SSH session.
+- rule: Login History Erasure
+  desc: Detects modification or deletion of user login history logs.
+  condition: >
+    (open_write or evt.type in (unlink, unlinkat, rename, renameat)) and 
+    (
+      fd.name startswith "/var/run/utmp" or 
+      fd.name startswith "/var/log/wtmp" or 
+      fd.name startswith "/var/log/btmp" or 
+      fd.name startswith "/var/log/lastlog"
+    ) and 
+    not proc.name in (login, sshd, systemd, systemd-logind, sshd-session)
+  output: >
+    Login history log cleared or modified (file=%fd.name process=%proc.name user=%user.name)
+  priority: CRITICAL
+  tags: [mitre_defense_evasion, anti_forensics]
+
+# ==============================================================================
+# RULE: SYSTEMD TIMER CREATION (Persistence)
+# ==============================================================================
+# Detects the creation or modification of systemd .timer files.
+# Unlike cron, systemd timers require a file ending in .timer to be placed
+# in system directories like /etc/systemd/system/.
+- rule: Systemd Timer Creation
+  desc: Detects creation or modification of systemd timer units.
+  condition: >
+    (open_write or evt.type in (rename, renameat)) and 
+    fd.name endswith ".timer" and 
+    (
+      fd.name startswith "/etc/systemd/system/" or 
+      fd.name startswith "/usr/lib/systemd/system/" or 
+      fd.name startswith "/run/systemd/system/"
+    ) and 
+    not proc.name in (systemd, dpkg, apt, rpm, dnf, yum)
+  output: >
+    Systemd timer created/modified (persistence attempt) 
+    (file=%fd.name process=%proc.name user=%user.name)
+  priority: CRITICAL
+  tags: [mitre_persistence, scheduled_task, systemd]
+
+
+# ==============================================================================
+# RULE: SYSTEMD TIMER ACTIVATION
+# ==============================================================================
+# Detects the use of systemctl to start or enable a timer.
+# Just creating the file isn't enough; the attacker must run:
+# 'systemctl enable --now malicious.timer'
+- rule: Systemd Timer Activated
+  desc: Detects enabling or starting of systemd timers via systemctl.
+  condition: >
+    spawned_process and 
+    proc.name = "systemctl" and 
+    (proc.cmdline contains "enable" or proc.cmdline contains "start") and 
+    proc.cmdline contains ".timer"
+  output: >
+    Systemd timer enabled or started (command=%proc.cmdline user=%user.name)
+  priority: WARNING
+  tags: [mitre_persistence, scheduled_task]
