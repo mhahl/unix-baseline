@@ -256,13 +256,14 @@
 # RULE: SUID/SGID BIT SETTING
 # ==============================================================================
 # Detects 'chmod' being used to add SUID (u+s) or SGID (g+s) bits.
-# Attackers do this to create "backdoor" binaries that always run as root.
+# Updated to exclude Ansible temporary files which generate noise during deployments.
 - rule: SUID/SGID Bit Set via Chmod
   desc: Detects attempts to set the SUID or SGID bit on a file.
   condition: >
     spawned_process and 
     proc.name = "chmod" and 
-    (proc.cmdline contains "u+s" or proc.cmdline contains "g+s" or proc.cmdline contains "4755")
+    (proc.cmdline contains "u+s" or proc.cmdline contains "g+s" or proc.cmdline contains "4755") and
+    not proc.cmdline contains "/.ansible/tmp/"
   output: >
     SUID/SGID bit set on file (cmd=%proc.cmdline user=%user.name file=%proc.args)
   priority: CRITICAL
@@ -367,16 +368,16 @@
 # RULE: SYSTEMD TIMER ACTIVATION
 # ==============================================================================
 # Detects the use of systemctl to start or enable a timer.
-# Just creating the file isn't enough; the attacker must run:
-# 'systemctl enable --now malicious.timer'
+# Exception added for 'is-enabled', which is a read-only status check.
 - rule: Systemd Timer Activated
   desc: Detects enabling or starting of systemd timers via systemctl.
   condition: >
     spawned_process and 
     proc.name = "systemctl" and 
     (proc.cmdline contains "enable" or proc.cmdline contains "start") and 
-    proc.cmdline contains ".timer"
+    proc.cmdline contains ".timer" and
+    not proc.cmdline contains "is-enabled"
   output: >
     Systemd timer enabled or started (command=%proc.cmdline user=%user.name)
   priority: WARNING
-  tags: [mitre_persistence, scheduled_task]
+  tags: [mitre_persistence, scheduled_task
