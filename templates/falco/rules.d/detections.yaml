@@ -60,11 +60,12 @@
       SetroubleshootP,
       chrome,
       pipewire,
-      pipewire-pulse
+      pipewire-pulse,
+      dbus-broker-lau
     )
   output: >
     Fileless execution attempt via memfd_create (process=%proc.name command=%proc.cmdline)
-  priority: CRITICAL
+  priority: WARNING
   tags: [mitre_execution, fileless_malware]
 
 # ==============================================================================
