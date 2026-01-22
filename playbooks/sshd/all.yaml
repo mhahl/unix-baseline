@@ -1,7 +1,7 @@
 ---
 
 - name: Get exact OpenSSH server version
-  ansible.builtin.command: sshd -V
+  ansible.builtin.command: ssh -V
   register: sshd_version_raw
   changed_when: false
 
