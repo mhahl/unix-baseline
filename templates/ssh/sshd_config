@@ -132,4 +132,4 @@ PerSourceMaxStartups 3
 Match Group grp-sigaint-users
     AllowTcpForwarding local
     X11Forwarding yes
-    PermitOpen 127.0.0.1:* ::1:*
+    PermitOpen 127.0.0.1:* [::1]:*
