@@ -77,11 +77,10 @@ AllowGroups grp-sigaint-users
 AllowAgentForwarding no
 
 # Disable all TCP forwarding/tunneling (very restrictive – good security posture)
-AllowTcpForwarding local
+AllowTcpForwarding no
 
 # Prevent clients from binding forwarded ports to non-loopback addresses
 GatewayPorts no
-PermitOpen 127.0.0.1:*
 
 # Disable X11 forwarding (almost never needed anymore + security risk)
 X11Forwarding no
@@ -102,7 +101,7 @@ TCPKeepAlive yes
 ClientAliveInterval 300
 
 # Disconnect after 0 missed keepalive responses → 5 min idle timeout
-ClientAliveCountMax 0
+ClientAliveCountMax 3
 
 # Don't do DNS lookups on client IP (speeds up connection + avoids DNS poisoning)
 UseDNS no
@@ -130,4 +129,7 @@ PerSourceMaxStartups 3
 # Other penalties kept at sane defaults; adjust as needed
 #PerSourcePenalties authfail:5s crash:90s noauth:1s grace-exceeded:20s refuseconnection:10s
 
-
+Match Group grp-sigaint-users
+    AllowTcpForwarding local
+    X11Forwarding yes
+    PermitOpen 127.0.0.1:* ::1:*
