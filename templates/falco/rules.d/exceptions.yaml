@@ -176,9 +176,9 @@
     # Allow systemd-tmpfiles to scan SSH directories during cleanup/maintenance.
     # It often checks permissions or ages of files in /root/.ssh.
     - name: systemd_tmpfiles_ssh
-      fields: [proc.exe, fd.name]
+      fields: [proc.exepath, fd.name]
       comps: [=, startswith]
       values:
-        - ["/usr/bin/systemd-tmpfiles", "/root/.ssh"]
+        - [ "/usr/bin/systemd-tmpfiles", "/root/.ssh" ]
   override:
     exceptions: append
