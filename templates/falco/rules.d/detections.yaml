@@ -42,30 +42,39 @@
 # ==============================================================================
 # RULE: FILELESS EXECUTION (memfd_create)
 # ==============================================================================
-# Detects the 'memfd_create' syscall, which creates an anonymous file in RAM.
-# Advanced malware uses this to execute code without touching the disk
-# (bypassing traditional antivirus scanning).
+# Detects the 'memfd_create' syscall.
+# Uses 'proc.exepath' for system binaries (Safe).
+# Uses 'proc.cmdline' for specific Python scripts (Safe, avoids whitelisting all 'python').
 - rule: Fileless Execution via memfd_create
   desc: >
     Detects the creation of memory-only files (memfd), a technique often used for 
-    fileless malware execution or code injection to bypass disk scanning.
+    fileless malware execution or code injection.
   condition: >
     evt.type = memfd_create and 
-    not proc.name in (
-      systemd, 
-      systemd-executor, 
-      systemd-journald, 
-      cockpit-tls,
-      setroubleshootd,
-      SetroubleshootP,
-      chrome,
-      pipewire,
-      pipewire-pulse,
-      dbus-broker-lau,
-      brave
+    not (
+      (
+        proc.exepath in (
+          "/usr/lib/systemd/systemd",
+          "/usr/lib/systemd/systemd-executor",
+          "/usr/lib/systemd/systemd-journald",
+          "/usr/libexec/cockpit-tls",
+          "/usr/sbin/setroubleshootd",
+          "/opt/google/chrome/chrome",
+          "/opt/brave.com/brave/brave",
+          "/usr/bin/pipewire",
+          "/usr/bin/pipewire-pulse",
+          "/usr/bin/dbus-broker-launch"
+        )
+      ) 
+      or 
+      (
+        proc.name = "SetroubleshootP" and 
+        proc.cmdline contains "setroubleshoot"
+      )
     )
   output: >
-    Fileless execution attempt via memfd_create (process=%proc.name command=%proc.cmdline)
+    Fileless execution attempt via memfd_create 
+    (process=%proc.name exepath=%proc.exepath command=%proc.cmdline)
   priority: WARNING
   tags: [mitre_execution, fileless_malware]
 

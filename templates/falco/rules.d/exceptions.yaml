@@ -1,9 +1,3 @@
-####
-# !!!!!
-# !!!!! These rules were refactored using AI
-# !!!!!
-###
-
 # ==============================================================================
 # RULE: WRITE BELOW ROOT
 # ==============================================================================
@@ -180,5 +174,22 @@
       comps: [=, startswith]
       values:
         - [ "/usr/bin/systemd-tmpfiles", "/root/.ssh" ]
+  override:
+    exceptions: append
+
+- rule: Modify binary dirs
+  exceptions:
+    # [Component: Package Managers]
+    # Allow DNF/RPM to update system binaries (Path specific)
+    - name: package_manager_update_paths
+      fields: [proc.exepath]
+      comps: [in]
+      values:
+        - ["/usr/bin/dnf"]
+        - ["/usr/bin/dnf5"]
+        - ["/usr/bin/rpm"]
+        - ["/usr/bin/yum"]
+        - ["/usr/bin/microdnf"]
+
   override:
     exceptions: append
