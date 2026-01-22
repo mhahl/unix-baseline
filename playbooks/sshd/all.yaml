@@ -1,14 +1,5 @@
 ---
 
-- name: Get exact OpenSSH server version
-  ansible.builtin.command: ssh -V
-  register: sshd_version_raw
-  changed_when: false
-
-- name: Set OpenSSH version fact
-  ansible.builtin.set_fact:
-    openssh_server_version: "{{ sshd_version_raw.stderr | regex_search('OpenSSH_([\\d\\.]+)p?\\d*', '\\1') | first | default('0.0') | float }}"
-
 - name: Deploy sshd hardening and template
   ansible.builtin.template:
     src: "../templates/{{ item.template }}"
