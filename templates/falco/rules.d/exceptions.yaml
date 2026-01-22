@@ -58,7 +58,7 @@
       comps: [=, startswith]
       values:
         - ["/usr/sbin/cupsd", "/etc/cups/"]
-        
+
     # [Component: Certmonger]
     # Allow certmonger agents to update NSS databases (keys/certs) in /etc/pki.
     # Uses proc.exepath because proc.name is often truncated (e.g. "dogtag-ipa-rene").

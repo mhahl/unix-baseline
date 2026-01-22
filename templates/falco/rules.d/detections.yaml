@@ -61,7 +61,8 @@
       chrome,
       pipewire,
       pipewire-pulse,
-      dbus-broker-lau
+      dbus-broker-lau,
+      brave
     )
   output: >
     Fileless execution attempt via memfd_create (process=%proc.name command=%proc.cmdline)
