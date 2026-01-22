@@ -77,7 +77,7 @@ AllowGroups grp-sigaint-users
 AllowAgentForwarding no
 
 # Disable all TCP forwarding/tunneling (very restrictive – good security posture)
-AllowTcpForwarding no
+AllowTcpForwarding local
 
 # Prevent clients from binding forwarded ports to non-loopback addresses
 GatewayPorts no
