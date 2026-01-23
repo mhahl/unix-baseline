@@ -154,3 +154,13 @@
     state: restarted
   listen: "restart networkmanager"
   when: baseline_os | lower == 'linux'
+
+- name: Restart clamav services
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: restarted
+  listen: "restart clamav services"
+  loop:
+    - clamd@scan
+    - clamonacc
+  when: baseline_os | lower == 'linux'
