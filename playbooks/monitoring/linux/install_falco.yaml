@@ -47,7 +47,6 @@
     mode: '0644'
   notify: Restart Falco
 
-
 - name: Find all old rule files
   ansible.builtin.find:
     paths: /etc/falco/rules.d
@@ -63,6 +62,7 @@
   ansible.builtin.file:
     path: "{{ item.path }}"
     state: absent
+  notify: Restart Falco
   loop: "{{ files_found.files }}"
   loop_control:
     label: "{{ item.path | basename }}"

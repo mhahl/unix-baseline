@@ -71,6 +71,11 @@
         proc.name = "SetroubleshootP" and 
         proc.cmdline contains "setroubleshoot"
       )
+      or 
+      (
+        proc.name = "setroubleshootd" and
+        proc.cmdline contains "/usr/sbin/setroubleshootd"
+      )
     )
   output: >
     Fileless execution attempt via memfd_create 

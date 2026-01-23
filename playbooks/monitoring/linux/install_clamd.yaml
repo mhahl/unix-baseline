@@ -72,7 +72,6 @@
     # 2. Subtract the NFS list from your config list
     clamd_onaccess_include_dirs: "{{ clamd_onaccess_include_dirs | difference(current_nfs_mounts) }}"
 
-
 - name: Deploy ClamAV configuration files
   ansible.builtin.template:
     src: "../templates/{{ item.template }}"
