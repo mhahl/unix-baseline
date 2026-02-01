@@ -19,7 +19,7 @@
     state: touch
     owner: tlog
     group: root
-    mode: '0640'
+    mode: '0660'
     access_time: preserve
     modification_time: preserve
 
