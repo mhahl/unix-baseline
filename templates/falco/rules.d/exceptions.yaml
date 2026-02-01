@@ -166,6 +166,7 @@
 # ==============================================================================
 - rule: Read ssh information
   exceptions:
+    -
     # [Component: Systemd]
     # Allow systemd-tmpfiles to scan SSH directories during cleanup/maintenance.
     # It often checks permissions or ages of files in /root/.ssh.
@@ -174,6 +175,15 @@
       comps: [=, startswith]
       values:
         - [ "/usr/bin/systemd-tmpfiles", "/root/.ssh" ]
+
+    # [Component: OpenSSH]
+    # Allow the new 'sshd-session' binary (modern OpenSSH) to read user keys
+    - name: sshd_session_reader
+      fields: [proc.exepath]
+      comps: [=]
+      values:
+        - ["/usr/libexec/openssh/sshd-session"]
+
   override:
     exceptions: append
 

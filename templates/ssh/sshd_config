@@ -121,8 +121,6 @@ Banner none
 # SFTP subsystem – path to internal-sftp or sftp-server binary
 Subsystem sftp /usr/libexec/openssh/sftp-server
 
-PerSourceMaxStartups 3
-
 # PerSourcePenalties (OpenSSH 9.8+): built-in IP penalty for bad behavior
 # authfail:10s  ← each failed auth attempt adds 10 seconds penalty to the IP
 # Penalties accumulate → if total > min (default 15s), connection refused

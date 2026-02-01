@@ -352,10 +352,19 @@
       fd.name startswith "/var/log/wtmp" or 
       fd.name startswith "/var/log/btmp" or 
       fd.name startswith "/var/log/lastlog"
-    ) and 
-    not proc.name in (login, sshd, systemd, systemd-logind, sshd-session)
+    ) 
+    and not proc.exepath in (
+      "/usr/bin/login",
+      "/usr/sbin/sshd",
+      "/usr/lib/systemd/systemd",
+      "/usr/lib/systemd/systemd-logind",
+      "/usr/libexec/openssh/sshd-session"
+    )
+    and not (
+      proc.exepath = "/usr/bin/sudo" and fd.name = "/var/run/utmp"
+    )
   output: >
-    Login history log cleared or modified (file=%fd.name process=%proc.name user=%user.name)
+    Login history log cleared or modified (file=%fd.name process=%proc.name exepath=%proc.exepath user=%user.name)
   priority: CRITICAL
   tags: [mitre_defense_evasion, anti_forensics]
 
