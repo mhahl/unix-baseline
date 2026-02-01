@@ -37,9 +37,8 @@ readonly HISTTIMEFORMAT
 # -----------------------------------------------------------------------------
 # 2. SESSION SECURITY
 # -----------------------------------------------------------------------------
-# Auto-logout idle sessions after 300 seconds (5 minutes).
-# This mitigates the risk of an admin walking away from an open root terminal.
-export TMOUT=300
+# Auto-logout idle sessions after 1800 seconds (30 minutes).
+export TMOUT=1800
 readonly TMOUT
 
 # Set restrictive umask.
@@ -63,4 +62,4 @@ else
 fi
 
 # Standard editor
-export EDITOR=vim
+export EDITOR=vi
