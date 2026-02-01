@@ -1,33 +1,23 @@
----
-- name: Create sysctl config file for inotify watches
-  ansible.builtin.copy:
-    content: |
-      # Increased inotify watchers for ClamAV on-access scanning
-      fs.inotify.max_user_watches = 655360
-    dest: /etc/sysctl.d/90-inotify-watches.conf
-    mode: '0644'
-  register: sysctl
-
-- name: Apply the sysctl parameter immediately
-  ansible.builtin.shell: |
-    sysctl -w fs.inotify.max_user_watches=655360
-  when: sysctl.changed
-
+# -----------------------------------------------------------------------------
+# 1. INSTALLATION & SYSTEM PREP
+# -----------------------------------------------------------------------------
 - name: Install required ClamAV packages
   ansible.builtin.dnf:
     name:
       - clamav
       - clamd
-      - clamav-update  # Ensures freshclam is available
+      - clamav-update
     state: present
 
-- name: Remove custom capabilities override (if present)
-  ansible.builtin.file:
-    path: /etc/systemd/system/clamd@.service.d/capabilities.conf
-    state: absent
-  notify: daemon-reload
+- name: Configure inotify watches for ClamAV
+  ansible.posix.sysctl:
+    name: fs.inotify.max_user_watches
+    value: '655360'
+    state: present
+    sysctl_file: /etc/sysctl.d/90-inotify-watches.conf
+    reload: yes
 
-- name: Ensure /var/cache/clamd directory exists with correct ownership
+- name: Ensure ClamAV runtime directories exist
   ansible.builtin.file:
     path: /var/cache/clamd
     state: directory
@@ -35,83 +25,85 @@
     group: clamscan
     mode: '0750'
 
-- name: Enable SELinux boolean for system-wide scanning (persistent)
-  ansible.posix.seboolean:
-    name: antivirus_can_scan_system
-    state: true
-    persistent: true
-  when: ansible_selinux.status == 'enabled'   # or use your previous boolean_check logic
+- name: Remove custom capabilities override (if present)
+  ansible.builtin.file:
+    path: /etc/systemd/system/clamd@.service.d/capabilities.conf
+    state: absent
+  notify: daemon-reload
 
-- name: Ensure proper SELinux file context for /var/cache/clamd
-  community.general.sefcontext:
-    target: '/var/cache/clamd(/.*)?'
-    setype: antivirus_tmp_t
-    state: present
-  register: fcontext_result
+# -----------------------------------------------------------------------------
+# 2. SELINUX CONFIGURATION (Conditional Block)
+# -----------------------------------------------------------------------------
+- name: Configure SELinux for ClamAV
   when: ansible_selinux.status == 'enabled'
+  block:
+    - name: Enable antivirus_can_scan_system boolean
+      ansible.posix.seboolean:
+        name: antivirus_can_scan_system
+        state: true
+        persistent: true
 
-- name: Apply SELinux file contexts to /var/cache/clamd
-  ansible.builtin.command: restorecon -R -v /var/cache/clamd
-  changed_when: "'relabeled' in restorecon_result.stdout"
-  register: restorecon_result
-  when:
-    - ansible_selinux.status == 'enabled'
-    - fcontext_result.changed
+    - name: Set file context for /var/cache/clamd
+      community.general.sefcontext:
+        target: '/var/cache/clamd(/.*)?'
+        setype: antivirus_tmp_t
+        state: present
+      register: fcontext_result
 
+    - name: Apply SELinux file contexts
+      ansible.builtin.command: restorecon -R -v /var/cache/clamd
+      when: fcontext_result.changed
+      register: restorecon_result
+      changed_when: "'relabeled' in restorecon_result.stdout"
+
+# -----------------------------------------------------------------------------
+# 3. CONFIGURATION & DATABASE
+# -----------------------------------------------------------------------------
 - name: Filter out ANY NFS mounts from the ClamAV scan list
-  vars:
-    # 1. Create a list of all current NFS mount paths (e.g. ['/home', '/mnt/backup'])
-    current_nfs_mounts: >-
-      {{ 
-        ansible_mounts 
-        | selectattr('fstype', 'match', '^nfs') 
-        | map(attribute='mount') 
-        | list 
-      }}
   set_fact:
-    # 2. Subtract the NFS list from your config list
-    clamd_onaccess_include_dirs: "{{ clamd_onaccess_include_dirs | difference(current_nfs_mounts) }}"
+    clamd_onaccess_include_dirs: >-
+      {{ 
+        clamd_onaccess_include_dirs | difference(
+          ansible_mounts 
+          | selectattr('fstype', 'match', '^nfs') 
+          | map(attribute='mount') 
+          | list
+        ) 
+      }}
 
 - name: Deploy ClamAV configuration files
   ansible.builtin.template:
-    src: "../templates/{{ item.template }}"
+    src: "../templates/{{ item.src }}"
     dest: "{{ item.dest }}"
     owner: root
     group: root
     mode: "{{ item.mode }}"
   loop:
-    - { template: "clamd/scan.conf.j2", dest: "/etc/clamd.d/scan.conf", mode: "0644" }
-    - { template: "clamd/clamav-notify.sh.j2", dest: "/usr/local/bin/clamav-notify", mode: "0755" }
-  notify:
-    - restart clamd
-    - restart clamonacc
+    - { src: "clamd/scan.conf.j2", dest: "/etc/clamd.d/scan.conf", mode: "0644" }
+    - { src: "clamd/clamav-notify.sh.j2", dest: "/usr/local/bin/clamav-notify", mode: "0755" }
+  notify: restart clamav services
 
-- name: Check if ClamAV virus database files exist
-  ansible.builtin.stat:
-    path: /var/lib/clamav/daily.cld
-  register: daily_cld_stat
+- name: Check for existing ClamAV database files
+  ansible.builtin.find:
+    paths: /var/lib/clamav
+    patterns: "*.c[vd]d"  # Matches .cvd (compressed) or .cld (uncompressed)
+  register: clamav_db_files
 
-- name: Run initial freshclam update if database is missing
+- name: Run initial freshclam if database is missing
   ansible.builtin.command: freshclam
-  when: not daily_cld_stat.stat.exists
-  notify:
-    - restart clamd
-    - restart clamonacc
+  # Run only if NO database files were found
+  when: clamav_db_files.matched == 0
 
-- name: Enable and start clamav-freshclam service
+# -----------------------------------------------------------------------------
+# 4. SERVICE STATE
+# -----------------------------------------------------------------------------
+- name: Ensure ClamAV services are enabled and started
   ansible.builtin.systemd:
-    name: clamav-freshclam
+    name: "{{ item }}"
     enabled: true
     state: started
-
-- name: Enable and start clamd@scan service
-  ansible.builtin.systemd:
-    name: clamd@scan
-    enabled: true
-    state: started
-
-- name: Enable and start clamonacc service
-  ansible.builtin.systemd:
-    name: clamonacc
-    enabled: true
-    state: started
+    daemon_reload: yes  # Ensures unit file changes (capabilities) are picked up
+  loop:
+    - clamav-freshclam
+    - clamd@scan
+    - clamonacc
